@@ -1,1 +1,0 @@
-{{- include "deep.lib.serviceMonitor" (dict "ctx" $ "component" "distributor" "memberlist" true) }}
