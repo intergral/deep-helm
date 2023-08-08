@@ -1,49 +1,25 @@
-name: Release
+name: Release Charts
 
 on:
-  release:
-    types: [ created ]
-
-env:
-  VERSION: ${{ github.ref_name }}
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  push:
+    branches:
+      - main
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Generate index
-        run: |
-          helm package ${GITHUB_WORKSPACE}/charts/deep-distributed
-
-      - name: Create index
-        run: helm repo index .
-
-      - name: Create pages
-        run: |
-          mkdir pages
-          mv index.yaml *.tgz pages
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
-          path: pages
+          fetch-depth: 0
 
-  deploy:
-    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
-    permissions:
-      pages: write      # to deploy to Pages
-      id-token: write   # to verify the deployment originates from an appropriate source
-    needs: build
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.5.0
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
