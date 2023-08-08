@@ -9,7 +9,7 @@ Prerequisites:
 
 Once helm is installed and configured, add the repo as follows:
 ```bash
-helm repo add deep ...
+helm repo add deep https://intergral.github.io/deep-helm/
 ```
 
 You can then run `helm search repo deep` to see the charts.
