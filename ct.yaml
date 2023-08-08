@@ -1,2 +1,4 @@
 # See https://github.com/helm/chart-testing#configuration
 validate-maintainers: false
+chart-repos:
+  - prometheus-community=https://prometheus-community.github.io/helm-charts
