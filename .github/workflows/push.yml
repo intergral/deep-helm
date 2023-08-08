@@ -1,3 +1,5 @@
+name: Helm Lint
+
 on:
   push:
     branches: [ "master" ]
