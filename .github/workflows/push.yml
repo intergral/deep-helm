@@ -4,6 +4,10 @@ on:
   pull_request:
     branches: [ "master" ]
 
+defaults:
+  run:
+    working-directory: ./app
+
 jobs:
   lint:
     runs-on: ubuntu-latest
