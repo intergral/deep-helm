@@ -4,14 +4,10 @@ on:
   pull_request:
     branches: [ "master" ]
 
-defaults:
-  run:
-    working-directory: ./app
-
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - name: Helm Lint
         run: |
-          helm lint ./charts/deep-distributed
+          helm lint ${GITHUB_WORKSPACE}/charts/deep-distributed

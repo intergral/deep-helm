@@ -11,17 +11,13 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-defaults:
-  run:
-    working-directory: ./app
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Generate index
         run: |
-          helm package ./charts/deep-distributed
+          helm package ${GITHUB_WORKSPACE}/charts/deep-distributed
 
       - name: Create index
         run: helm repo index .
