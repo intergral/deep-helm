@@ -1,1 +1,2 @@
+# See https://github.com/helm/chart-testing#configuration
 validate-maintainers: false
