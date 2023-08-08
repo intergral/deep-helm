@@ -10,4 +10,4 @@ jobs:
     steps:
       - name: Helm Lint
         run: |
-          helm lint charts/deep-distributed
+          helm lint ./charts/deep-distributed

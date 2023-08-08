@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Generate index
         run: |
-          helm package charts/deep-distributed
+          helm package ./charts/deep-distributed
 
       - name: Create index
         run: helm repo index .
