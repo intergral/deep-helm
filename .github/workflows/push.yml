@@ -8,6 +8,9 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
+      - name: debug
+        run: |
+          ls -la
       - name: Helm Lint
         run: |
           helm lint ${GITHUB_WORKSPACE}/charts/deep-distributed
