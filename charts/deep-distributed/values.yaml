@@ -40,6 +40,9 @@ deep:
       drop:
         - ALL
     readOnlyRootFilesystem: true
+  memberlist:
+    # -- Adds the appProtocol field to the memberlist service. This allows memberlist to work with istio protocol selection. Set the optional service protocol. Ex: "tcp", "http" or "https".
+    appProtocol: null
 
 compactor:
   config:
@@ -162,6 +165,11 @@ distributor:
   extraVolumeMounts: []
   # -- Extra volumes for distributor deployment
   extraVolumes: []
+  # -- Adds the appProtocol field to the distributor service. This allows distributor to work with istio protocol selection.
+  appProtocol:
+    # -- Set the optional grpc service protocol. Ex: "grpc", "http2" or "https"
+    grpc: null
+  # the config to be added to the deep.yaml config file
   config:
     log_received_snapshots:
       enabled: false
@@ -276,8 +284,15 @@ global_overrides:
   metrics_generator_processors: []
 
 # Per tenants overrides
-overrides: |
-  overrides: {}
+overrides:
+  # -- Configuration is loaded from the secret called 'externalConfigSecretName'.
+  # If 'useExternalConfig' is true, then the configuration is not generated, just
+  # consumed.
+  useExternalConfig: false
+  # -- Name of the Secret or ConfigMap that contains the runtime configuration (used for naming even if config is internal).
+  externalRuntimeConfigName: '{{ include "deep.resourceName" (dict "ctx" . "component" "runtime") }}'
+  overrides: |
+    overrides: {}
 
 # Set Deep server configuration
 server:
@@ -316,16 +331,6 @@ config:
 
   # -- Structured deep configuration
   structuredConfig: {}
-  deep2: |
-    multitenancy_enabled: {{ .Values.config.multitenancyEnabled }}
-
-    compactor:
-      {{- if .Values.compactor.config }}
-        {{- toYaml .Values.compactor.config | nindent 2 }}
-      {{- end }}
-      ring:
-        kvstore:
-          store: memberlist
 
   deep: |
     multitenancy_enabled: {{ .Values.config.multitenancyEnabled }}

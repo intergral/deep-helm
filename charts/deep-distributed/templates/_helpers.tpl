@@ -39,6 +39,9 @@ helm.sh/chart: {{ include "deep.chart" .ctx }}
 {{- if .ctx.Chart.AppVersion }}
 app.kubernetes.io/version: {{ .ctx.Chart.AppVersion | quote }}
 {{- end }}
+{{- if .memberlist }}
+app.kubernetes.io/part-of: memberlist
+{{- end }}
 app.kubernetes.io/managed-by: {{ .ctx.Release.Service }}
 {{- end }}
 
@@ -141,6 +144,17 @@ configMap:
 {{- end -}}
 
 {{/*
+The volume to mount for tempo runtime configuration
+*/}}
+{{- define "deep.runtimeVolume" -}}
+configMap:
+  name: {{ tpl .Values.overrides.externalRuntimeConfigName . }}
+  items:
+    - key: "overrides.yaml"
+      path: "overrides.yaml"
+{{- end -}}
+
+{{/*
 Calculate values.yaml section name from component name
 Expects the component name in .component on the passed context
 */}}
@@ -156,4 +170,12 @@ Docker image selector for Tempo. Hierachy based on global, component, and tempo 
 {{- $repository := coalesce .global.repository .component.repository -}}
 {{- $tag := coalesce .global.tag .component.tag .defaultVersion | toString -}}
 {{- printf "%s/%s:%s" $registry $repository $tag -}}
+{{- end -}}
+
+
+{{/*
+Renders the overrides config
+*/}}
+{{- define "deep.overridesConfig" -}}
+{{ tpl .Values.overrides.overrides . }}
 {{- end -}}

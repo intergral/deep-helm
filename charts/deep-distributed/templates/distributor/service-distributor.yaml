@@ -32,11 +32,17 @@ spec:
       port: 9095
       protocol: TCP
       targetPort: 9095
+      {{- if .Values.distributor.appProtocol.grpc }}
+      appProtocol: {{ .Values.distributor.appProtocol.grpc }}
+      {{- end }}
     {{- if .Values.distributor.config.receivers.deep.enabled }}
     - name: distributor-deep
       port: 43315
       protocol: TCP
       targetPort: deep
+      {{- if .Values.distributor.appProtocol.grpc }}
+      appProtocol: {{ .Values.distributor.appProtocol.grpc }}
+      {{- end }}
     {{- end }}
   selector:
     {{- include "deep.selectorLabels" $dict | nindent 4 }}
