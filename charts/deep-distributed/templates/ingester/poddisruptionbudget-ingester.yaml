@@ -1,0 +1,14 @@
+{{- if gt (int .Values.ingester.replicas) 1 }}
+{{ $dict := dict "ctx" . "component" "ingester" "memberlist" true }}
+apiVersion: {{ include "deep.pdb.apiVersion" . }}
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "deep.resourceName" $dict }}
+  labels:
+    {{- include "deep.labels" $dict | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "deep.selectorLabels" $dict | nindent 6 }}
+  maxUnavailable: {{ sub (.Values.ingester.replicas) (add (div .Values.ingester.config.lifecycler.ring.replication_factor 2) 1) }}
+{{- end }}

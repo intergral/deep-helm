@@ -1,13 +1,16 @@
 ***********************************************************************
  Welcome to Intergral Deep
  Chart version: {{ .Chart.Version }}
- Tempo version: {{ .Chart.AppVersion }}
+ Deep version: {{ .Chart.AppVersion }}
 ***********************************************************************
 
 Installed components:
-* ingester
-* distributor
-* querier
-* tracepoint
-* query-frontend
-* compactor
+* ingester ({{.Values.ingester.replicas}})
+* distributor ({{.Values.distributor.replicas}})
+* querier ({{.Values.querier.replicas}})
+* tracepoint ({{.Values.tracepoint.replicas}})
+* query-frontend ({{.Values.queryFrontend.replicas}})
+* compactor ({{.Values.compactor.replicas}}
+{{- if .Values.gateway.enabled}}
+* gateway -{{- if .Values.gateway.ingress.enabled}}{{- with (index .Values.gateway.ingress.hosts 0)}}{{ .host}}{{- end}}{{- end}} ({{.Values.gateway.replicas}})
+{{- end}}
