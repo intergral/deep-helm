@@ -54,7 +54,7 @@ compactor:
   # -- Number of replicas for the compactor
   replicas: 1
   # -- hostAliases to add
-  hostAliases: [ ]
+  hostAliases: []
   #  - ip: 1.2.3.4
   #    hostnames:
   #      - domain.tld
@@ -62,7 +62,7 @@ compactor:
     # -- The Docker registry for the compactor image. Overrides `deep.image.registry`
     registry: null
     # -- Optional list of imagePullSecrets. Overrides `deep.image.pullSecrets`
-    pullSecrets: [ ]
+    pullSecrets: []
     # -- Docker image repository for the compactor image. Overrides `deep.image.repository`
     repository: null
     # -- Docker image tag for the compactor image. Overrides `deep.image.tag`
@@ -70,32 +70,32 @@ compactor:
   # -- The name of the PriorityClass for compactor pods
   priorityClassName: null
   # -- Labels for compactor pods
-  podLabels: { }
+  podLabels: {}
   # -- Annotations for compactor deployment
-  annotations: { }
+  annotations: {}
   # -- Annotations for compactor pods
-  podAnnotations: { }
+  podAnnotations: {}
   # -- Additional CLI args for the compactor
-  extraArgs: [ ]
+  extraArgs: []
   # -- Environment variables to add to the compactor pods
-  extraEnv: [ ]
+  extraEnv: []
   # -- Environment variables from secrets or configmaps to add to the compactor pods
-  extraEnvFrom: [ ]
+  extraEnvFrom: []
   # -- Resource requests and limits for the compactor
-  resources: { }
+  resources: {}
   # -- Grace period to allow the compactor to shutdown before it is killed
   terminationGracePeriodSeconds: 30
   # -- Node selector for compactor pods
-  nodeSelector: { }
+  nodeSelector: {}
   # -- Tolerations for compactor pods
-  tolerations: [ ]
+  tolerations: []
   # -- Extra volumes for compactor pods
-  extraVolumeMounts: [ ]
+  extraVolumeMounts: []
   # -- Extra volumes for compactor deployment
-  extraVolumes: [ ]
+  extraVolumes: []
   service:
     # -- Annotations for compactor service
-    annotations: { }
+    annotations: {}
   dnsConfigOverides:
     enabled: false
     dnsConfig:
@@ -238,7 +238,7 @@ querier:
   # -- Number of replicas for the querier
   replicas: 1
   # -- hostAliases to add
-  hostAliases: [ ]
+  hostAliases: []
   #  - ip: 1.2.3.4
   #    hostnames:
   #      - domain.tld
@@ -250,7 +250,7 @@ querier:
     # -- Maximum autoscaling replicas for the querier
     maxReplicas: 3
     # -- Autoscaling behavior configuration for the querier
-    behavior: { }
+    behavior: {}
     # -- Target CPU utilisation percentage for the querier
     targetCPUUtilizationPercentage: 60
     # -- Target memory utilisation percentage for the querier
@@ -259,7 +259,7 @@ querier:
     # -- The Docker registry for the querier image. Overrides `deep.image.registry`
     registry: null
     # -- Optional list of imagePullSecrets. Overrides `deep.image.pullSecrets`
-    pullSecrets: [ ]
+    pullSecrets: []
     # -- Docker image repository for the querier image. Overrides `deep.image.repository`
     repository: null
     # -- Docker image tag for the querier image. Overrides `deep.image.tag`
@@ -269,17 +269,17 @@ querier:
   # -- Annotations for the querier deployment
   annotations: {}
   # -- Labels for querier pods
-  podLabels: { }
+  podLabels: {}
   # -- Annotations for querier pods
-  podAnnotations: { }
+  podAnnotations: {}
   # -- Additional CLI args for the querier
-  extraArgs: [ ]
+  extraArgs: []
   # -- Environment variables to add to the querier pods
-  extraEnv: [ ]
+  extraEnv: []
   # -- Environment variables from secrets or configmaps to add to the querier pods
-  extraEnvFrom: [ ]
+  extraEnvFrom: []
   # -- Resource requests and limits for the querier
-  resources: { }
+  resources: {}
   # -- Grace period to allow the querier to shutdown before it is killed
   terminationGracePeriodSeconds: 30
   # -- topologySpread for querier pods. Passed through `tpl` and, thus, to be configured as string
@@ -308,16 +308,16 @@ querier:
                 {{- include "deep.selectorLabels" (dict "ctx" . "component" "querier" "memberlist" true) | nindent 12 }}
             topologyKey: topology.kubernetes.io/zone
   # -- Node selector for querier pods
-  nodeSelector: { }
+  nodeSelector: {}
   # -- Tolerations for querier pods
-  tolerations: [ ]
+  tolerations: []
   # -- Extra volumes for querier pods
-  extraVolumeMounts: [ ]
+  extraVolumeMounts: []
   # -- Extra volumes for querier deployment
-  extraVolumes: [ ]
+  extraVolumes: []
   service:
     # -- Annotations for querier service
-    annotations: { }
+    annotations: {}
   # -- Adds the appProtocol field to the querier service. This allows querier to work with istio protocol selection.
   appProtocol:
     # -- Set the optional grpc service protocol. Ex: "grpc", "http2" or "https"
@@ -347,7 +347,7 @@ tracepoint:
   # -- Number of replicas for the querier
   replicas: 1
   # -- hostAliases to add
-  hostAliases: [ ]
+  hostAliases: []
   #  - ip: 1.2.3.4
   #    hostnames:
   #      - domain.tld
@@ -359,7 +359,7 @@ tracepoint:
     # -- Maximum autoscaling replicas for the querier
     maxReplicas: 3
     # -- Autoscaling behavior configuration for the querier
-    behavior: { }
+    behavior: {}
     # -- Target CPU utilisation percentage for the querier
     targetCPUUtilizationPercentage: 60
     # -- Target memory utilisation percentage for the querier
@@ -368,7 +368,7 @@ tracepoint:
     # -- The Docker registry for the querier image. Overrides `deep.image.registry`
     registry: null
     # -- Optional list of imagePullSecrets. Overrides `deep.image.pullSecrets`
-    pullSecrets: [ ]
+    pullSecrets: []
     # -- Docker image repository for the querier image. Overrides `deep.image.repository`
     repository: null
     # -- Docker image tag for the querier image. Overrides `deep.image.tag`
@@ -378,17 +378,17 @@ tracepoint:
   # -- Annotations for the querier deployment
   annotations: {}
   # -- Labels for querier pods
-  podLabels: { }
+  podLabels: {}
   # -- Annotations for querier pods
-  podAnnotations: { }
+  podAnnotations: {}
   # -- Additional CLI args for the querier
-  extraArgs: [ ]
+  extraArgs: []
   # -- Environment variables to add to the querier pods
-  extraEnv: [ ]
+  extraEnv: []
   # -- Environment variables from secrets or configmaps to add to the querier pods
-  extraEnvFrom: [ ]
+  extraEnvFrom: []
   # -- Resource requests and limits for the querier
-  resources: { }
+  resources: {}
   # -- Grace period to allow the querier to shutdown before it is killed
   terminationGracePeriodSeconds: 30
   # -- topologySpread for querier pods. Passed through `tpl` and, thus, to be configured as string
@@ -417,16 +417,16 @@ tracepoint:
                 {{- include "deep.selectorLabels" (dict "ctx" . "component" "tracepoint" "memberlist" true) | nindent 12 }}
             topologyKey: topology.kubernetes.io/zone
   # -- Node selector for querier pods
-  nodeSelector: { }
+  nodeSelector: {}
   # -- Tolerations for querier pods
-  tolerations: [ ]
+  tolerations: []
   # -- Extra volumes for querier pods
-  extraVolumeMounts: [ ]
+  extraVolumeMounts: []
   # -- Extra volumes for querier deployment
-  extraVolumes: [ ]
+  extraVolumes: []
   service:
     # -- Annotations for querier service
-    annotations: { }
+    annotations: {}
   # -- Adds the appProtocol field to the querier service. This allows querier to work with istio protocol selection.
   appProtocol:
     # -- Set the optional grpc service protocol. Ex: "grpc", "http2" or "https"
@@ -440,7 +440,7 @@ queryFrontend:
   # -- Number of replicas for the query-frontend
   replicas: 1
   # -- hostAliases to add
-  hostAliases: [ ]
+  hostAliases: []
   #  - ip: 1.2.3.4
   #    hostnames:
   #      - domain.tld
@@ -454,7 +454,7 @@ queryFrontend:
     # -- Maximum autoscaling replicas for the query-frontend
     maxReplicas: 3
     # -- Autoscaling behavior configuration for the query-frontend
-    behavior: { }
+    behavior: {}
     # -- Target CPU utilisation percentage for the query-frontend
     targetCPUUtilizationPercentage: 60
     # -- Target memory utilisation percentage for the query-frontend
@@ -463,7 +463,7 @@ queryFrontend:
     # -- The Docker registry for the query-frontend image. Overrides `deep.image.registry`
     registry: null
     # -- Optional list of imagePullSecrets. Overrides `deep.image.pullSecrets`
-    pullSecrets: [ ]
+    pullSecrets: []
     # -- Docker image repository for the query-frontend image. Overrides `deep.image.repository`
     repository: null
     # -- Docker image tag for the query-frontend image. Overrides `deep.image.tag`
@@ -472,27 +472,27 @@ queryFrontend:
     # -- Port of the query-frontend service
     port: 16686
     # -- Annotations for queryFrontend service
-    annotations: { }
+    annotations: {}
     # -- Labels for queryFrontend service
-    labels: { }
+    labels: {}
     # -- Type of service for the queryFrontend
     type: ClusterIP
     # -- If type is LoadBalancer you can assign the IP to the LoadBalancer
     loadBalancerIP: ""
     # -- If type is LoadBalancer limit incoming traffic from IPs.
-    loadBalancerSourceRanges: [ ]
+    loadBalancerSourceRanges: []
   serviceDiscovery:
     # -- Annotations for queryFrontendDiscovery service
-    annotations: { }
+    annotations: {}
     # -- Labels for queryFrontendDiscovery service
-    labels: { }
+    labels: {}
   ingress:
     # -- Specifies whether an ingress for the Jaeger should be created
     enabled: false
     # -- Ingress Class Name. MAY be required for Kubernetes versions >= 1.18
     # ingressClassName: nginx
     # -- Annotations for the Jaeger ingress
-    annotations: { }
+    annotations: {}
     # -- Hosts configuration for the Jaeger ingress
     hosts:
       - host: query.deep.example.com
@@ -508,17 +508,17 @@ queryFrontend:
   # -- The name of the PriorityClass for query-frontend pods
   priorityClassName: null
   # -- Labels for queryFrontend pods
-  podLabels: { }
+  podLabels: {}
   # -- Annotations for query-frontend pods
-  podAnnotations: { }
+  podAnnotations: {}
   # -- Additional CLI args for the query-frontend
-  extraArgs: [ ]
+  extraArgs: []
   # -- Environment variables to add to the query-frontend pods
-  extraEnv: [ ]
+  extraEnv: []
   # -- Environment variables from secrets or configmaps to add to the query-frontend pods
-  extraEnvFrom: [ ]
+  extraEnvFrom: []
   # -- Resource requests and limits for the query-frontend
-  resources: { }
+  resources: {}
   # -- Grace period to allow the query-frontend to shutdown before it is killed
   terminationGracePeriodSeconds: 30
   # -- topologySpread for query-frontend pods. Passed through `tpl` and, thus, to be configured as string
@@ -547,13 +547,13 @@ queryFrontend:
                 {{- include "deep.selectorLabels" (dict "ctx" . "component" "query-frontend") | nindent 12 }}
             topologyKey: topology.kubernetes.io/zone
   # -- Node selector for query-frontend pods
-  nodeSelector: { }
+  nodeSelector: {}
   # -- Tolerations for query-frontend pods
-  tolerations: [ ]
+  tolerations: []
   # -- Extra volumes for query-frontend pods
-  extraVolumeMounts: [ ]
+  extraVolumeMounts: []
   # -- Extra volumes for query-frontend deployment
-  extraVolumes: [ ]
+  extraVolumes: []
   # -- Adds the appProtocol field to the queryFrontend service. This allows queryFrontend to work with istio protocol selection.
   appProtocol:
     # -- Set the optional grpc service protocol. Ex: "grpc", "http2" or "https"
@@ -577,11 +577,11 @@ queryFrontend:
 
 ingester:
   # -- Annotations for the ingester StatefulSet
-  annotations: { }
+  annotations: {}
   # -- Number of replicas for the ingester
   replicas: 3
   # -- hostAliases to add
-  hostAliases: [ ]
+  hostAliases: []
   #  - ip: 1.2.3.4
   #    hostnames:
   #      - domain.tld
@@ -593,7 +593,7 @@ ingester:
     # -- Maximum autoscaling replicas for the ingester
     maxReplicas: 3
     # -- Autoscaling behavior configuration for the ingester
-    behavior: { }
+    behavior: {}
     # -- Target CPU utilisation percentage for the ingester
     targetCPUUtilizationPercentage: 60
     # -- Target memory utilisation percentage for the ingester
@@ -602,7 +602,7 @@ ingester:
     # -- The Docker registry for the ingester image. Overrides `global.image.registry`
     registry: null
     # -- Optional list of imagePullSecrets. Overrides `global.image.pullSecrets`
-    pullSecrets: [ ]
+    pullSecrets: []
     # -- Docker image repository for the ingester image. Overrides `global.image.repository`
     repository: null
     # -- Docker image tag for the ingester image. Overrides `global.image.tag`
@@ -610,17 +610,17 @@ ingester:
   # -- The name of the PriorityClass for ingester pods
   priorityClassName: null
   # -- Labels for ingester pods
-  podLabels: { }
+  podLabels: {}
   # -- Annotations for ingester pods
-  podAnnotations: { }
+  podAnnotations: {}
   # -- Additional CLI args for the ingester
-  extraArgs: [ ]
+  extraArgs: []
   # -- Environment variables to add to the ingester pods
-  extraEnv: [ ]
+  extraEnv: []
   # -- Environment variables from secrets or configmaps to add to the ingester pods
-  extraEnvFrom: [ ]
+  extraEnvFrom: []
   # -- Resource requests and limits for the ingester
-  resources: { }
+  resources: {}
   # -- Grace period to allow the ingester to shutdown before it is killed. Especially for the ingestor,
   # this must be increased. It must be long enough so ingesters can be gracefully shutdown flushing/transferring
   # all data and to successfully leave the member ring on shutdown.
@@ -652,13 +652,13 @@ ingester:
                 {{- include "deep.selectorLabels" (dict "ctx" . "component" "ingester") | nindent 12 }}
             topologyKey: topology.kubernetes.io/zone
   # -- Node selector for ingester pods
-  nodeSelector: { }
+  nodeSelector: {}
   # -- Tolerations for ingester pods
-  tolerations: [ ]
+  tolerations: []
   # -- Extra volumes for ingester pods
-  extraVolumeMounts: [ ]
+  extraVolumeMounts: []
   # -- Extra volumes for ingester deployment
-  extraVolumes: [ ]
+  extraVolumes: []
   persistence:
     # -- Enable creating PVCs which is required when using boltdb-shipper
     enabled: false
@@ -673,10 +673,10 @@ ingester:
     # set, choosing the default provisioner (gp2 on AWS, standard on GKE, AWS, and OpenStack).
     storageClass: null
     # -- Annotations for ingester's persist volume claim
-    annotations: { }
+    annotations: {}
   service:
     # -- Annotations for ingester service
-    annotations: { }
+    annotations: {}
   # -- Adds the appProtocol field to the ingester service. This allows ingester to work with istio protocol selection.
   appProtocol:
     # -- Set the optional grpc service protocol. Ex: "grpc", "http2" or "https"
