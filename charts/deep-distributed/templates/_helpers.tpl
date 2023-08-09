@@ -166,9 +166,9 @@ Expects the component name in .component on the passed context
 Docker image selector for Tempo. Hierachy based on global, component, and tempo values.
 */}}
 {{- define "deep.deepImage" -}}
-{{- $registry := coalesce .global.registry .component.registry -}}
-{{- $repository := coalesce .global.repository .component.repository -}}
-{{- $tag := coalesce .global.tag .component.tag .defaultVersion | toString -}}
+{{- $registry := coalesce .component.registry .global.registry -}}
+{{- $repository := coalesce .component.repository .global.repository -}}
+{{- $tag := coalesce .component.tag .global.tag .defaultVersion | toString -}}
 {{- printf "%s/%s:%s" $registry $repository $tag -}}
 {{- end -}}
 
@@ -178,4 +178,28 @@ Renders the overrides config
 */}}
 {{- define "deep.overridesConfig" -}}
 {{ tpl .Values.overrides.overrides . }}
+{{- end -}}
+
+
+{{/*
+Return the appropriate apiVersion for HorizontalPodAutoscaler.
+*/}}
+{{- define "deep.hpa.apiVersion" -}}
+  {{- if and (.Capabilities.APIVersions.Has "autoscaling/v2") (semverCompare ">=1.23-0" .Capabilities.KubeVersion.Version) -}}
+    {{- print "autoscaling/v2" -}}
+  {{- else -}}
+    {{- print "autoscaling/v2beta1" -}}
+  {{- end -}}
+{{- end -}}
+
+
+{{/*
+Return the appropriate apiVersion for PodDisruptionBudget.
+*/}}
+{{- define "deep.pdb.apiVersion" -}}
+  {{- if .Capabilities.APIVersions.Has "policy/v1/PodDisruptionBudget" -}}
+    {{- print "policy/v1" -}}
+  {{- else -}}
+    {{- print "policy/v1beta1" -}}
+  {{- end -}}
 {{- end -}}

@@ -1,0 +1,11 @@
+{{- if .Values.gateway.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "deep.resourceName" (dict "ctx" . "component" "gateway") }}
+  labels:
+    {{- include "deep.labels" (dict "ctx" . "component" "gateway") | nindent 4 }}
+data:
+  nginx.conf: |
+    {{- tpl .Values.gateway.nginxConfig.file . | nindent 4 }}
+{{- end }}

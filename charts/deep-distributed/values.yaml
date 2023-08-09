@@ -11,13 +11,19 @@ global:
     pullPolicy: IfNotPresent
   # -- Overrides the priorityClassName for all pods
   priorityClassName: null
+  # -- configures cluster domain ("cluster.local" by default)
+  clusterDomain: 'cluster.local'
+  # -- configures DNS service name
+  dnsService: 'kube-dns'
+  # -- configures DNS service namespace
+  dnsNamespace: 'kube-system'
 
 nameOverride: ""
 fullnameOverride: ""
 namespace: "deep"
 
 deep:
-  # -- Global labels for all tempo pods
+  # -- Global labels for all deep pods
   podLabels: {}
   # -- Common annotations for all pods
   podAnnotations: {}
@@ -45,6 +51,57 @@ deep:
     appProtocol: null
 
 compactor:
+  # -- Number of replicas for the compactor
+  replicas: 1
+  # -- hostAliases to add
+  hostAliases: [ ]
+  #  - ip: 1.2.3.4
+  #    hostnames:
+  #      - domain.tld
+  image:
+    # -- The Docker registry for the compactor image. Overrides `deep.image.registry`
+    registry: null
+    # -- Optional list of imagePullSecrets. Overrides `deep.image.pullSecrets`
+    pullSecrets: [ ]
+    # -- Docker image repository for the compactor image. Overrides `deep.image.repository`
+    repository: null
+    # -- Docker image tag for the compactor image. Overrides `deep.image.tag`
+    tag: null
+  # -- The name of the PriorityClass for compactor pods
+  priorityClassName: null
+  # -- Labels for compactor pods
+  podLabels: { }
+  # -- Annotations for compactor deployment
+  annotations: { }
+  # -- Annotations for compactor pods
+  podAnnotations: { }
+  # -- Additional CLI args for the compactor
+  extraArgs: [ ]
+  # -- Environment variables to add to the compactor pods
+  extraEnv: [ ]
+  # -- Environment variables from secrets or configmaps to add to the compactor pods
+  extraEnvFrom: [ ]
+  # -- Resource requests and limits for the compactor
+  resources: { }
+  # -- Grace period to allow the compactor to shutdown before it is killed
+  terminationGracePeriodSeconds: 30
+  # -- Node selector for compactor pods
+  nodeSelector: { }
+  # -- Tolerations for compactor pods
+  tolerations: [ ]
+  # -- Extra volumes for compactor pods
+  extraVolumeMounts: [ ]
+  # -- Extra volumes for compactor deployment
+  extraVolumes: [ ]
+  service:
+    # -- Annotations for compactor service
+    annotations: { }
+  dnsConfigOverides:
+    enabled: false
+    dnsConfig:
+      options:
+        - name: ndots
+          value: "3"    # This is required for Azure Kubernetes Service (AKS) https://github.com/grafana/tempo/issues/1462
   config:
     compaction:
       # -- Duration to keep blocks
@@ -178,6 +235,93 @@ distributor:
         enabled: true
 
 querier:
+  # -- Number of replicas for the querier
+  replicas: 1
+  # -- hostAliases to add
+  hostAliases: [ ]
+  #  - ip: 1.2.3.4
+  #    hostnames:
+  #      - domain.tld
+  autoscaling:
+    # -- Enable autoscaling for the querier
+    enabled: false
+    # -- Minimum autoscaling replicas for the querier
+    minReplicas: 1
+    # -- Maximum autoscaling replicas for the querier
+    maxReplicas: 3
+    # -- Autoscaling behavior configuration for the querier
+    behavior: { }
+    # -- Target CPU utilisation percentage for the querier
+    targetCPUUtilizationPercentage: 60
+    # -- Target memory utilisation percentage for the querier
+    targetMemoryUtilizationPercentage:
+  image:
+    # -- The Docker registry for the querier image. Overrides `deep.image.registry`
+    registry: null
+    # -- Optional list of imagePullSecrets. Overrides `deep.image.pullSecrets`
+    pullSecrets: [ ]
+    # -- Docker image repository for the querier image. Overrides `deep.image.repository`
+    repository: null
+    # -- Docker image tag for the querier image. Overrides `deep.image.tag`
+    tag: null
+  # -- The name of the PriorityClass for querier pods
+  priorityClassName: null
+  # -- Annotations for the querier deployment
+  annotations: {}
+  # -- Labels for querier pods
+  podLabels: { }
+  # -- Annotations for querier pods
+  podAnnotations: { }
+  # -- Additional CLI args for the querier
+  extraArgs: [ ]
+  # -- Environment variables to add to the querier pods
+  extraEnv: [ ]
+  # -- Environment variables from secrets or configmaps to add to the querier pods
+  extraEnvFrom: [ ]
+  # -- Resource requests and limits for the querier
+  resources: { }
+  # -- Grace period to allow the querier to shutdown before it is killed
+  terminationGracePeriodSeconds: 30
+  # -- topologySpread for querier pods. Passed through `tpl` and, thus, to be configured as string
+  # @default -- Defaults to allow skew no more then 1 node per AZ
+  topologySpreadConstraints: |
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          {{- include "deep.selectorLabels" (dict "ctx" . "component" "querier") | nindent 6 }}
+  # -- Affinity for querier pods. Passed through `tpl` and, thus, to be configured as string
+  # @default -- Hard node and soft zone anti-affinity
+  affinity: |
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              {{- include "deep.selectorLabels" (dict "ctx" . "component" "querier" "memberlist" true) | nindent 10 }}
+          topologyKey: kubernetes.io/hostname
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                {{- include "deep.selectorLabels" (dict "ctx" . "component" "querier" "memberlist" true) | nindent 12 }}
+            topologyKey: topology.kubernetes.io/zone
+  # -- Node selector for querier pods
+  nodeSelector: { }
+  # -- Tolerations for querier pods
+  tolerations: [ ]
+  # -- Extra volumes for querier pods
+  extraVolumeMounts: [ ]
+  # -- Extra volumes for querier deployment
+  extraVolumes: [ ]
+  service:
+    # -- Annotations for querier service
+    annotations: { }
+  # -- Adds the appProtocol field to the querier service. This allows querier to work with istio protocol selection.
+  appProtocol:
+    # -- Set the optional grpc service protocol. Ex: "grpc", "http2" or "https"
+    grpc: null
   config:
     frontend_worker:
       frontend_address: '{{ include "deep.resourceName" (dict "ctx" . "component" "query-frontend-discovery") }}:9095'
@@ -199,7 +343,221 @@ querier:
     # -- This value controls the overall number of simultaneous subqueries that the querier will service at once. It does not distinguish between the types of queries.
     max_concurrent_queries: 20
 
+tracepoint:
+  # -- Number of replicas for the querier
+  replicas: 1
+  # -- hostAliases to add
+  hostAliases: [ ]
+  #  - ip: 1.2.3.4
+  #    hostnames:
+  #      - domain.tld
+  autoscaling:
+    # -- Enable autoscaling for the querier
+    enabled: false
+    # -- Minimum autoscaling replicas for the querier
+    minReplicas: 1
+    # -- Maximum autoscaling replicas for the querier
+    maxReplicas: 3
+    # -- Autoscaling behavior configuration for the querier
+    behavior: { }
+    # -- Target CPU utilisation percentage for the querier
+    targetCPUUtilizationPercentage: 60
+    # -- Target memory utilisation percentage for the querier
+    targetMemoryUtilizationPercentage:
+  image:
+    # -- The Docker registry for the querier image. Overrides `deep.image.registry`
+    registry: null
+    # -- Optional list of imagePullSecrets. Overrides `deep.image.pullSecrets`
+    pullSecrets: [ ]
+    # -- Docker image repository for the querier image. Overrides `deep.image.repository`
+    repository: null
+    # -- Docker image tag for the querier image. Overrides `deep.image.tag`
+    tag: null
+  # -- The name of the PriorityClass for querier pods
+  priorityClassName: null
+  # -- Annotations for the querier deployment
+  annotations: {}
+  # -- Labels for querier pods
+  podLabels: { }
+  # -- Annotations for querier pods
+  podAnnotations: { }
+  # -- Additional CLI args for the querier
+  extraArgs: [ ]
+  # -- Environment variables to add to the querier pods
+  extraEnv: [ ]
+  # -- Environment variables from secrets or configmaps to add to the querier pods
+  extraEnvFrom: [ ]
+  # -- Resource requests and limits for the querier
+  resources: { }
+  # -- Grace period to allow the querier to shutdown before it is killed
+  terminationGracePeriodSeconds: 30
+  # -- topologySpread for querier pods. Passed through `tpl` and, thus, to be configured as string
+  # @default -- Defaults to allow skew no more then 1 node per AZ
+  topologySpreadConstraints: |
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          {{- include "deep.selectorLabels" (dict "ctx" . "component" "tracepoint") | nindent 6 }}
+  # -- Affinity for querier pods. Passed through `tpl` and, thus, to be configured as string
+  # @default -- Hard node and soft zone anti-affinity
+  affinity: |
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              {{- include "deep.selectorLabels" (dict "ctx" . "component" "tracepoint" "memberlist" true) | nindent 10 }}
+          topologyKey: kubernetes.io/hostname
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                {{- include "deep.selectorLabels" (dict "ctx" . "component" "tracepoint" "memberlist" true) | nindent 12 }}
+            topologyKey: topology.kubernetes.io/zone
+  # -- Node selector for querier pods
+  nodeSelector: { }
+  # -- Tolerations for querier pods
+  tolerations: [ ]
+  # -- Extra volumes for querier pods
+  extraVolumeMounts: [ ]
+  # -- Extra volumes for querier deployment
+  extraVolumes: [ ]
+  service:
+    # -- Annotations for querier service
+    annotations: { }
+  # -- Adds the appProtocol field to the querier service. This allows querier to work with istio protocol selection.
+  appProtocol:
+    # -- Set the optional grpc service protocol. Ex: "grpc", "http2" or "https"
+    grpc: null
+  config:
+    api:
+      frontend_worker:
+        frontend_address: '{{ include "deep.resourceName" (dict "ctx" . "component" "query-frontend-discovery") }}:9095'
+
 queryFrontend:
+  # -- Number of replicas for the query-frontend
+  replicas: 1
+  # -- hostAliases to add
+  hostAliases: [ ]
+  #  - ip: 1.2.3.4
+  #    hostnames:
+  #      - domain.tld
+  # -- Annotations for the deployment
+  annotations: {}
+  autoscaling:
+    # -- Enable autoscaling for the query-frontend
+    enabled: false
+    # -- Minimum autoscaling replicas for the query-frontend
+    minReplicas: 1
+    # -- Maximum autoscaling replicas for the query-frontend
+    maxReplicas: 3
+    # -- Autoscaling behavior configuration for the query-frontend
+    behavior: { }
+    # -- Target CPU utilisation percentage for the query-frontend
+    targetCPUUtilizationPercentage: 60
+    # -- Target memory utilisation percentage for the query-frontend
+    targetMemoryUtilizationPercentage:
+  image:
+    # -- The Docker registry for the query-frontend image. Overrides `deep.image.registry`
+    registry: null
+    # -- Optional list of imagePullSecrets. Overrides `deep.image.pullSecrets`
+    pullSecrets: [ ]
+    # -- Docker image repository for the query-frontend image. Overrides `deep.image.repository`
+    repository: null
+    # -- Docker image tag for the query-frontend image. Overrides `deep.image.tag`
+    tag: null
+  service:
+    # -- Port of the query-frontend service
+    port: 16686
+    # -- Annotations for queryFrontend service
+    annotations: { }
+    # -- Labels for queryFrontend service
+    labels: { }
+    # -- Type of service for the queryFrontend
+    type: ClusterIP
+    # -- If type is LoadBalancer you can assign the IP to the LoadBalancer
+    loadBalancerIP: ""
+    # -- If type is LoadBalancer limit incoming traffic from IPs.
+    loadBalancerSourceRanges: [ ]
+  serviceDiscovery:
+    # -- Annotations for queryFrontendDiscovery service
+    annotations: { }
+    # -- Labels for queryFrontendDiscovery service
+    labels: { }
+  ingress:
+    # -- Specifies whether an ingress for the Jaeger should be created
+    enabled: false
+    # -- Ingress Class Name. MAY be required for Kubernetes versions >= 1.18
+    # ingressClassName: nginx
+    # -- Annotations for the Jaeger ingress
+    annotations: { }
+    # -- Hosts configuration for the Jaeger ingress
+    hosts:
+      - host: query.deep.example.com
+        paths:
+          - path: /
+            # -- pathType (e.g. ImplementationSpecific, Prefix, .. etc.) might also be required by some Ingress Controllers
+            # pathType: Prefix
+    # -- TLS configuration for the Jaeger ingress
+    tls:
+      - secretName: deep-query-tls
+        hosts:
+          - query.deep.example.com
+  # -- The name of the PriorityClass for query-frontend pods
+  priorityClassName: null
+  # -- Labels for queryFrontend pods
+  podLabels: { }
+  # -- Annotations for query-frontend pods
+  podAnnotations: { }
+  # -- Additional CLI args for the query-frontend
+  extraArgs: [ ]
+  # -- Environment variables to add to the query-frontend pods
+  extraEnv: [ ]
+  # -- Environment variables from secrets or configmaps to add to the query-frontend pods
+  extraEnvFrom: [ ]
+  # -- Resource requests and limits for the query-frontend
+  resources: { }
+  # -- Grace period to allow the query-frontend to shutdown before it is killed
+  terminationGracePeriodSeconds: 30
+  # -- topologySpread for query-frontend pods. Passed through `tpl` and, thus, to be configured as string
+  # @default -- Defaults to allow skew no more then 1 node per AZ
+  topologySpreadConstraints: |
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          {{- include "deep.selectorLabels" (dict "ctx" . "component" "query-frontend") | nindent 6 }}
+  # -- Affinity for query-frontend pods. Passed through `tpl` and, thus, to be configured as string
+  # @default -- Hard node and soft zone anti-affinity
+  affinity: |
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              {{- include "deep.selectorLabels" (dict "ctx" . "component" "query-frontend") | nindent 10 }}
+          topologyKey: kubernetes.io/hostname
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                {{- include "deep.selectorLabels" (dict "ctx" . "component" "query-frontend") | nindent 12 }}
+            topologyKey: topology.kubernetes.io/zone
+  # -- Node selector for query-frontend pods
+  nodeSelector: { }
+  # -- Tolerations for query-frontend pods
+  tolerations: [ ]
+  # -- Extra volumes for query-frontend pods
+  extraVolumeMounts: [ ]
+  # -- Extra volumes for query-frontend deployment
+  extraVolumes: [ ]
+  # -- Adds the appProtocol field to the queryFrontend service. This allows queryFrontend to work with istio protocol selection.
+  appProtocol:
+    # -- Set the optional grpc service protocol. Ex: "grpc", "http2" or "https"
+    grpc: null
   config:
     # -- Number of times to retry a request sent to a querier
     max_retries: 2
@@ -218,6 +576,111 @@ queryFrontend:
       hedge_requests_up_to: 2
 
 ingester:
+  # -- Annotations for the ingester StatefulSet
+  annotations: { }
+  # -- Number of replicas for the ingester
+  replicas: 3
+  # -- hostAliases to add
+  hostAliases: [ ]
+  #  - ip: 1.2.3.4
+  #    hostnames:
+  #      - domain.tld
+  autoscaling:
+    # -- Enable autoscaling for the ingester. WARNING: Autoscaling ingesters can result in lost data. Only do this if you know what you're doing.
+    enabled: false
+    # -- Minimum autoscaling replicas for the ingester
+    minReplicas: 1
+    # -- Maximum autoscaling replicas for the ingester
+    maxReplicas: 3
+    # -- Autoscaling behavior configuration for the ingester
+    behavior: { }
+    # -- Target CPU utilisation percentage for the ingester
+    targetCPUUtilizationPercentage: 60
+    # -- Target memory utilisation percentage for the ingester
+    targetMemoryUtilizationPercentage:
+  image:
+    # -- The Docker registry for the ingester image. Overrides `global.image.registry`
+    registry: null
+    # -- Optional list of imagePullSecrets. Overrides `global.image.pullSecrets`
+    pullSecrets: [ ]
+    # -- Docker image repository for the ingester image. Overrides `global.image.repository`
+    repository: null
+    # -- Docker image tag for the ingester image. Overrides `global.image.tag`
+    tag: null
+  # -- The name of the PriorityClass for ingester pods
+  priorityClassName: null
+  # -- Labels for ingester pods
+  podLabels: { }
+  # -- Annotations for ingester pods
+  podAnnotations: { }
+  # -- Additional CLI args for the ingester
+  extraArgs: [ ]
+  # -- Environment variables to add to the ingester pods
+  extraEnv: [ ]
+  # -- Environment variables from secrets or configmaps to add to the ingester pods
+  extraEnvFrom: [ ]
+  # -- Resource requests and limits for the ingester
+  resources: { }
+  # -- Grace period to allow the ingester to shutdown before it is killed. Especially for the ingestor,
+  # this must be increased. It must be long enough so ingesters can be gracefully shutdown flushing/transferring
+  # all data and to successfully leave the member ring on shutdown.
+  terminationGracePeriodSeconds: 300
+  # -- topologySpread for ingester pods. Passed through `tpl` and, thus, to be configured as string
+  # @default -- Defaults to allow skew no more then 1 node per AZ
+  topologySpreadConstraints: |
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          {{- include "deep.selectorLabels" (dict "ctx" . "component" "ingester") | nindent 6 }}
+  # -- Affinity for ingester pods. Passed through `tpl` and, thus, to be configured as string
+  # @default -- Soft node and soft zone anti-affinity
+  affinity: |
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                {{- include "deep.selectorLabels" (dict "ctx" . "component" "ingester") | nindent 12 }}
+            topologyKey: kubernetes.io/hostname
+        - weight: 75
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                {{- include "deep.selectorLabels" (dict "ctx" . "component" "ingester") | nindent 12 }}
+            topologyKey: topology.kubernetes.io/zone
+  # -- Node selector for ingester pods
+  nodeSelector: { }
+  # -- Tolerations for ingester pods
+  tolerations: [ ]
+  # -- Extra volumes for ingester pods
+  extraVolumeMounts: [ ]
+  # -- Extra volumes for ingester deployment
+  extraVolumes: [ ]
+  persistence:
+    # -- Enable creating PVCs which is required when using boltdb-shipper
+    enabled: false
+    # -- use emptyDir with ramdisk instead of PVC. **Please note that all data in ingester will be lost on pod restart**
+    inMemory: false
+    # -- Size of persistent or memory disk
+    size: 10Gi
+    # -- Storage class to be used.
+    # If defined, storageClassName: <storageClass>.
+    # If set to "-", storageClassName: "", which disables dynamic provisioning.
+    # If empty or set to null, no storageClassName spec is
+    # set, choosing the default provisioner (gp2 on AWS, standard on GKE, AWS, and OpenStack).
+    storageClass: null
+    # -- Annotations for ingester's persist volume claim
+    annotations: { }
+  service:
+    # -- Annotations for ingester service
+    annotations: { }
+  # -- Adds the appProtocol field to the ingester service. This allows ingester to work with istio protocol selection.
+  appProtocol:
+    # -- Set the optional grpc service protocol. Ex: "grpc", "http2" or "https"
+    grpc: null
   config:
     lifecycler:
       ring:
@@ -226,16 +689,6 @@ ingester:
         kvstore:
           store: memberlist
       tokens_file_path: /var/deep/tokens.json
-    # -- Amount of time a snapshot must be idle before flushing it to the wal.
-    snapshot_idle_period: null
-    # -- How often to sweep all tenants and move snapshots from live -> wal -> completed blocks.
-    flush_check_period: null
-    # -- Maximum size of a block before cutting it
-    max_block_bytes: null
-    # -- Maximum length of time before cutting a block
-    max_block_duration: null
-    # -- Duration to keep blocks in the ingester after they have been flushed
-    complete_block_timeout: null
 
 # To configure a different storage backend instead of local storage:
 # storage:
@@ -253,6 +706,8 @@ storage:
     backend: local
     wal:
       path: /var/deep/wal
+    local:
+      path: /var/deep/blocks
 
 metricsGenerator:
   enabled: false
@@ -315,8 +770,7 @@ server:
 config:
   # -- Configuration is loaded from the secret called 'externalConfigSecretName'.
   # If 'useExternalConfig' is true, then the configuration is not generated, just
-  # consumed.  Top level keys for `tempo.yaml` and `overrides.yaml` are to be
-  # provided by the user.
+  # consumed.
   useExternalConfig: false
 
   # -- Defines what kind of object stores the configuration, a ConfigMap or a Secret.
@@ -434,3 +888,251 @@ metaMonitoring:
     scheme: http
     # -- ServiceMonitor will use these tlsConfig settings to make the health check requests
     tlsConfig: null
+
+# Configuration for the gateway
+gateway:
+  # -- Specifies whether the gateway should be enabled
+  enabled: false
+  # -- Number of replicas for the gateway
+  replicas: 1
+  # -- hostAliases to add
+  hostAliases: []
+  #  - ip: 1.2.3.4
+  #    hostnames:
+  #      - domain.tld
+  autoscaling:
+    # -- Enable autoscaling for the gateway
+    enabled: false
+    # -- Minimum autoscaling replicas for the gateway
+    minReplicas: 1
+    # -- Maximum autoscaling replicas for the gateway
+    maxReplicas: 3
+    # -- Autoscaling behavior configuration for the gateway
+    behavior: {}
+    # -- Target CPU utilisation percentage for the gateway
+    targetCPUUtilizationPercentage: 60
+    # -- Target memory utilisation percentage for the gateway
+    targetMemoryUtilizationPercentage:
+  # -- Enable logging of 2xx and 3xx HTTP requests
+  verboseLogging: true
+  image:
+    # -- The Docker registry for the gateway image. Overrides `global.image.registry`
+    registry: null
+    # -- Optional list of imagePullSecrets. Overrides `global.image.pullSecrets`
+    pullSecrets: []
+    # -- The gateway image repository
+    repository: nginxinc/nginx-unprivileged
+    # -- The gateway image tag
+    tag: 1.19-alpine
+    # -- The gateway image pull policy
+    pullPolicy: IfNotPresent
+  # -- The name of the PriorityClass for gateway pods
+  priorityClassName: null
+  # -- Labels for gateway pods
+  podLabels: {}
+  # -- Annotations for gateway pods
+  podAnnotations: {}
+  # -- Additional CLI args for the gateway
+  extraArgs: []
+  # -- Environment variables to add to the gateway pods
+  extraEnv: []
+  # -- Environment variables from secrets or configmaps to add to the gateway pods
+  extraEnvFrom: []
+  # -- Volumes to add to the gateway pods
+  extraVolumes: []
+  # -- Volume mounts to add to the gateway pods
+  extraVolumeMounts: []
+  # -- Resource requests and limits for the gateway
+  resources: {}
+  # -- Grace period to allow the gateway to shutdown before it is killed
+  terminationGracePeriodSeconds: 30
+  # -- topologySpread for gateway pods. Passed through `tpl` and, thus, to be configured as string
+  # @default -- Defaults to allow skew no more then 1 node per AZ
+  topologySpreadConstraints: |
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          {{- include "deep.selectorLabels" (dict "ctx" . "component" "gateway") | nindent 6 }}
+  # -- Affinity for gateway pods. Passed through `tpl` and, thus, to be configured as string
+  # @default -- Hard node and soft zone anti-affinity
+  affinity: |
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              {{- include "deep.selectorLabels" (dict "ctx" . "component" "gateway") | nindent 10 }}
+          topologyKey: kubernetes.io/hostname
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                {{- include "deep.selectorLabels" (dict "ctx" . "component" "gateway") | nindent 12 }}
+            topologyKey: topology.kubernetes.io/zone
+  # -- Node selector for gateway pods
+  nodeSelector: {}
+  # -- Tolerations for gateway pods
+  tolerations: []
+  # Gateway service configuration
+  service:
+    # -- Port of the gateway service
+    port: 80
+    # -- Type of the gateway service
+    type: ClusterIP
+    # -- ClusterIP of the gateway service
+    clusterIP: null
+    # -- Node port if service type is NodePort
+    nodePort: null
+    # -- Load balancer IPO address if service type is LoadBalancer
+    loadBalancerIP: null
+    # -- Annotations for the gateway service
+    annotations: {}
+    # -- Labels for gateway service
+    labels: {}
+    # -- Additional ports to be opneed on gateway service (e.g. for RPC connections)
+    additionalPorts: {}
+  # Gateway ingress configuration
+  ingress:
+    # -- Specifies whether an ingress for the gateway should be created
+    enabled: false
+    # -- Ingress Class Name. MAY be required for Kubernetes versions >= 1.18
+    # ingressClassName: nginx
+    # -- Annotations for the gateway ingress
+    annotations: {}
+    # -- Hosts configuration for the gateway ingress
+    hosts:
+      - host: gateway.deep.example.com
+        paths:
+          - path: /
+            # -- pathType (e.g. ImplementationSpecific, Prefix, .. etc.) might also be required by some Ingress Controllers
+            pathType: Prefix
+    # -- TLS configuration for the gateway ingress
+    tls:
+      - secretName: deep-gateway-tls
+        hosts:
+          - gateway.deep.example.com
+  # Basic auth configuration
+  basicAuth:
+    # -- Enables basic authentication for the gateway
+    enabled: false
+    # -- The basic auth username for the gateway
+    username: null
+    # -- The basic auth password for the gateway
+    password: null
+    # -- Uses the specified username and password to compute a htpasswd using Sprig's `htpasswd` function.
+    # The value is templated using `tpl`. Override this to use a custom htpasswd, e.g. in case the default causes
+    # high CPU load.
+    htpasswd: >-
+      {{ htpasswd (required "'gateway.basicAuth.username' is required" .Values.gateway.basicAuth.username) (required "'gateway.basicAuth.password' is required" .Values.gateway.basicAuth.password) }}
+    # -- Existing basic auth secret to use. Must contain '.htpasswd'
+    existingSecret: null
+  # Configures the readiness probe for the gateway
+  readinessProbe:
+    httpGet:
+      path: /
+      port: http-metrics
+    initialDelaySeconds: 15
+    timeoutSeconds: 1
+  nginxConfig:
+    # -- NGINX log format
+    logFormat: |-
+      main '$remote_addr - $remote_user [$time_local]  $status '
+              '"$request" $body_bytes_sent "$http_referer" '
+              '"$http_user_agent" "$http_x_forwarded_for"';
+    # -- Allows appending custom configuration to the server block
+    serverSnippet: ''
+    # -- Allows appending custom configuration to the http block
+    httpSnippet: ''
+    # -- Allows overriding the DNS resolver address nginx will use
+    resolver: ''
+    # -- Config file contents for Nginx. Passed through the `tpl` function to allow templating
+    # @default -- See values.yaml
+    file: |
+      worker_processes  5;  ## Default: 1
+      error_log  /dev/stderr;
+      pid        /tmp/nginx.pid;
+      worker_rlimit_nofile 8192;
+
+      events {
+        worker_connections  4096;  ## Default: 1024
+      }
+
+      http {
+        client_body_temp_path /tmp/client_temp;
+        proxy_temp_path       /tmp/proxy_temp_path;
+        fastcgi_temp_path     /tmp/fastcgi_temp;
+        uwsgi_temp_path       /tmp/uwsgi_temp;
+        scgi_temp_path        /tmp/scgi_temp;
+
+        proxy_http_version    1.1;
+
+        default_type application/octet-stream;
+        log_format   {{ .Values.gateway.nginxConfig.logFormat }}
+
+        {{- if .Values.gateway.verboseLogging }}
+        access_log   /dev/stderr  main;
+        {{- else }}
+
+        map $status $loggable {
+          ~^[23]  0;
+          default 1;
+        }
+        access_log   /dev/stderr  main  if=$loggable;
+        {{- end }}
+
+        sendfile     on;
+        tcp_nopush   on;
+        {{- if .Values.gateway.nginxConfig.resolver }}
+        resolver {{ .Values.gateway.nginxConfig.resolver }};
+        {{- else }}
+        resolver {{ .Values.global.dnsService }}.{{ .Values.global.dnsNamespace }}.svc.{{ .Values.global.clusterDomain }};
+        {{- end }}
+
+        {{- with .Values.gateway.nginxConfig.httpSnippet }}
+        {{ . | nindent 2 }}
+        {{- end }}
+
+        server {
+          listen             8080;
+
+          {{- if .Values.gateway.basicAuth.enabled }}
+          auth_basic           "deep";
+          auth_basic_user_file /etc/nginx/secrets/.htpasswd;
+          {{- end }}
+
+          location = / {
+            return 200 'OK';
+            auth_basic off;
+          }
+
+          location ^~ /api {
+            proxy_pass       http://{{ include "deep.resourceName" (dict "ctx" . "component" "query-frontend") }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:3100$request_uri;
+          }
+
+          location = /flush {
+            proxy_pass       http://{{ include "deep.resourceName" (dict "ctx" . "component" "ingester") }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:3100$request_uri;
+          }
+
+          location = /shutdown {
+            proxy_pass       http://{{ include "deep.resourceName" (dict "ctx" . "component" "ingester") }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:3100$request_uri;
+          }
+
+          location = /distributor/ring {
+            proxy_pass       http://{{ include "deep.resourceName" (dict "ctx" . "component" "distributor") }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:3100$request_uri;
+          }
+
+          location = /ingester/ring {
+            proxy_pass       http://{{ include "deep.resourceName" (dict "ctx" . "component" "distributor") }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:3100$request_uri;
+          }
+
+          location = /compactor/ring {
+            proxy_pass       http://{{ include "deep.resourceName" (dict "ctx" . "component" "compactor") }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:3100$request_uri;
+          }
+
+          {{- with .Values.gateway.nginxConfig.serverSnippet }}
+          {{ . | nindent 4 }}
+          {{- end }}
+        }
+      }

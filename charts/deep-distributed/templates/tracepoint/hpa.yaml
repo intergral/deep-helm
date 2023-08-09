@@ -1,0 +1,45 @@
+{{- if .Values.tracepoint.autoscaling.enabled }}
+{{- $apiVersion := include "deep.hpa.apiVersion" . -}}
+apiVersion: {{ $apiVersion }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "deep.resourceName" (dict "ctx" . "component" "tracepoint") }}
+  labels:
+    {{- include "deep.labels" (dict "ctx" . "component" "tracepoint") | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "deep.resourceName" (dict "ctx" . "component" "tracepoint") }}
+  minReplicas: {{ .Values.tracepoint.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.tracepoint.autoscaling.maxReplicas }}
+  {{- with .Values.tracepoint.autoscaling.behavior }}
+  behavior:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  metrics:
+  {{- with .Values.tracepoint.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        {{- if (eq $apiVersion "autoscaling/v2") }}
+        target:
+          type: Utilization
+          averageUtilization: {{ . }}
+        {{- else }}
+        targetAverageUtilization: {{ . }}
+        {{- end }}
+  {{- end }}
+  {{- with .Values.tracepoint.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        {{- if (eq $apiVersion "autoscaling/v2") }}
+        target:
+          type: Utilization
+          averageUtilization: {{ . }}
+        {{- else }}
+        targetAverageUtilization: {{ . }}
+        {{- end }}
+  {{- end }}
+{{- end }}
