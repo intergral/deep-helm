@@ -14,4 +14,18 @@ entries:
     urls:
     - https://github.com/intergral/deep-helm/releases/download/deep-0.0.2/deep-0.0.2.tgz
     version: 0.0.2
-generated: "2023-08-08T15:49:04.770257425Z"
+  deep-distributed:
+  - apiVersion: v2
+    appVersion: 0.1.5
+    created: "2023-08-09T16:49:51.310358139Z"
+    description: A helm chart for deploying Deep in distributed mode.
+    digest: a3052e7001bd95a13459f78d258387e9d91ff12dce0126bf8d980b8609487373
+    maintainers:
+    - email: b.w.donnelly@gmail.com
+      name: Ben Donnelly
+    name: deep-distributed
+    type: application
+    urls:
+    - https://github.com/intergral/deep-helm/releases/download/deep-distributed-0.0.3/deep-distributed-0.0.3.tgz
+    version: 0.0.3
+generated: "2023-08-09T16:49:51.310363239Z"
