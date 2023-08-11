@@ -131,7 +131,7 @@ Calculate image name based on whether enterprise features are requested.  Fallba
 The volume to mount for tempo configuration
 */}}
 {{- define "deep.configVolume" -}}
-{{- if eq .Values.configStorageType "Secret" -}}
+{{- if eq .Values.config.storageType "Secret" -}}
 secret:
   secretName: {{ tpl .Values.config.externalSecretName . }}
 {{- else if eq .Values.config.storageType "ConfigMap" -}}

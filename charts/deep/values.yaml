@@ -1,0 +1,341 @@
+# Default values for deep.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+global:
+  image:
+    # define the default image config for all containers
+    registry: docker.io
+    repository: intergral/deep
+    tag: null
+    pullSecrets: []
+    pullPolicy: IfNotPresent
+  # -- Overrides the priorityClassName for all pods
+  priorityClassName: null
+  # -- configures cluster domain ("cluster.local" by default)
+  clusterDomain: 'cluster.local'
+  # -- configures DNS service name
+  dnsService: 'kube-dns'
+  # -- configures DNS service namespace
+  dnsNamespace: 'kube-system'
+
+nameOverride: ""
+fullnameOverride: ""
+namespace: "deep"
+
+deep:
+  replicas: 1
+  annotations: {}
+  podLabels: {}
+  podAnnotations: {}
+  updateStrategy: RollingUpdate
+  # -- The name of the PriorityClass
+  priorityClassName: null
+  memBallastSizeMbs: 1024
+  ## Additional container arguments
+  extraArgs: {}
+  # -- Environment variables to add
+  extraEnv: []
+  # -- Environment variables from secrets or configmaps to add to the ingester pods
+  extraEnvFrom: []
+  # -- Volume mounts to add
+  extraVolumeMounts: []
+  # - name: extra-volume
+  #   mountPath: /mnt/volume
+  #   readOnly: true
+  #   existingClaim: volume-claim
+  resources: {}
+  securityContext: {}
+  persistence:
+    enabled: false
+    # storageClassName: local-path
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
+  # -- Affinity for pod assignment. See: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+  # -- Node labels for pod assignment. See: https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+  # -- Tolerations for pod assignment. See: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+  # -- Volumes to add
+  extraVolumes: []
+
+service:
+  enabled: true
+  type: ClusterIP
+  annotations: {}
+  labels: {}
+  port: 80
+  ingress:
+    # -- Specifies whether an ingress for the gateway should be created
+    enabled: false
+    # -- Ingress Class Name. MAY be required for Kubernetes versions >= 1.18
+    # ingressClassName: nginx
+    # -- Annotations for the gateway ingress
+    annotations: {}
+    # these are used if host doesn't define paths
+    defaultPaths:
+      - path: /deepproto.proto
+        # -- pathType (e.g. ImplementationSpecific, Prefix, .. etc.) might also be required by some Ingress Controllers
+        pathType: Prefix
+        port: 43315
+      - path: /
+        # -- pathType (e.g. ImplementationSpecific, Prefix, .. etc.) might also be required by some Ingress Controllers
+        pathType: Prefix
+        port: 3100
+    # -- Hosts configuration for the gateway ingress
+    hosts:
+      - host: gateway.deep.example.com
+
+        paths:
+          - path: /deepproto.proto
+            # -- pathType (e.g. ImplementationSpecific, Prefix, .. etc.) might also be required by some Ingress Controllers
+            pathType: Prefix
+            port: 43315
+          - path: /
+            # -- pathType (e.g. ImplementationSpecific, Prefix, .. etc.) might also be required by some Ingress Controllers
+            pathType: Prefix
+            port: 3100
+    # -- TLS configuration for the gateway ingress
+    tls:
+      - secretName: deep-gateway-tls
+        hosts:
+          - gateway.deep.example.com
+
+compactor:
+  config:
+    compaction:
+      # -- Duration to keep blocks
+      block_retention: 48h
+      # Duration to keep blocks that have been compacted elsewhere
+      compacted_block_retention: 1h
+      # -- Blocks in this time window will be compacted together
+      compaction_window: 1h
+      # -- Amount of data to buffer from input blocks
+      v2_in_buffer_bytes: 5242880
+      # -- Flush data to backend when buffer is this large
+      v2_out_buffer_bytes: 20971520
+      # -- Maximum number of traces in a compacted block. WARNING: Deprecated. Use max_block_bytes instead.
+      max_compaction_objects: 6000000
+      # -- Maximum size of a compacted block in bytes
+      max_block_bytes: 107374182400
+      # -- Number of tenants to process in parallel during retention
+      retention_concurrency: 10
+      # -- Number of traces to buffer in memory during compaction
+      v2_prefetch_snapshot_count: 1000
+      # -- The maximum amount of time to spend compacting a single tenant before moving to the next
+      max_time_per_tenant: 5m
+      # -- The time between compaction cycles
+      compaction_cycle: 30s
+
+distributor:
+  config:
+    log_received_snapshots:
+      enabled: false
+    receivers:
+      deep:
+        enabled: true
+
+querier:
+  config:
+    snapshot_by_id:
+      # -- Timeout for trace lookup requests
+      query_timeout: 10s
+    search:
+      # -- Timeout for search requests
+      query_timeout: 30s
+      # -- If search_external_endpoints is set then the querier will primarily act as a proxy for whatever serverless backend you have configured. This setting allows the operator to have the querier prefer itself for a configurable number of subqueries.
+      prefer_self: 10
+      # -- If set to a non-zero value a second request will be issued at the provided duration. Recommended to be set to p99 of external search requests to reduce long tail latency.
+      external_hedge_requests_at: 8s
+      # -- The maximum number of requests to execute when hedging. Requires hedge_requests_at to be set.
+      external_hedge_requests_up_to: 2
+      # -- A list of external endpoints that the querier will use to offload backend search requests
+      external_endpoints: []
+    # -- This value controls the overall number of simultaneous subqueries that the querier will service at once. It does not distinguish between the types of queries.
+    max_concurrent_queries: 20
+
+tracepoint:
+  config: {}
+
+queryFrontend:
+  config:
+    # -- Number of times to retry a request sent to a querier
+    max_retries: 2
+    search:
+      # -- The number of concurrent jobs to execute when searching the backend
+      concurrent_jobs: 1000
+      # -- The target number of bytes for each job to handle when performing a backend search
+      target_bytes_per_job: 104857600
+    # -- Snapshot by ID lookup configuration
+    snapshot_by_id:
+      # -- The number of shards to split a snapshot by id query into.
+      query_shards: 50
+      # -- If set to a non-zero value, a second request will be issued at the provided duration. Recommended to be set to p99 of search requests to reduce long-tail latency.
+      hedge_requests_at: 2s
+      # -- The maximum number of requests to execute when hedging. Requires hedge_requests_at to be set. Must be greater than 0.
+      hedge_requests_up_to: 2
+
+ingester:
+  config:
+    concurrent_flushes: 4
+
+storage:
+  tracepoint:
+    # -- The supported storage backends are gcs, s3 and azure
+    backend: local
+    wal:
+      path: /var/deep/wal
+    local:
+      path: /var/deep/blocks
+
+metricsGenerator:
+  enabled: false
+
+# Global overrides
+global_overrides:
+  per_tenant_override_config: /runtime-config/overrides.yaml
+  metrics_generator_processors: []
+
+
+# Per tenants overrides
+overrides:
+  # -- Configuration is loaded from the secret called 'externalConfigSecretName'.
+  # If 'useExternalConfig' is true, then the configuration is not generated, just
+  # consumed.
+  useExternalConfig: false
+  # -- Name of the Secret or ConfigMap that contains the runtime configuration (used for naming even if config is internal).
+  externalRuntimeConfigName: '{{ include "deep.resourceName" (dict "ctx" . "component" "runtime") }}'
+  overrides: |
+    overrides: {}
+
+# Set Deep server configuration
+server:
+  # --  HTTP server listen host
+  httpListenPort: 3100
+  # -- Log level. Can be set to trace, debug, info (default), warn, error, fatal, panic
+  logLevel: info
+  # -- Log format. Can be set to logfmt (default) or json.
+  logFormat: logfmt
+  # -- Max gRPC message size that can be received
+  grpc_server_max_recv_msg_size: 4194304
+  # -- Max gRPC message size that can be sent
+  grpc_server_max_send_msg_size: 4194304
+  # -- Read timeout for HTTP server
+  http_server_read_timeout: 30s
+  # -- Write timeout for HTTP server
+  http_server_write_timeout: 30s
+
+# define the config for deep
+config:
+  # -- Configuration is loaded from the secret called 'externalConfigSecretName'.
+  # If 'useExternalConfig' is true, then the configuration is not generated, just
+  # consumed.
+  useExternalConfig: false
+
+  # -- Defines what kind of object stores the configuration, a ConfigMap or a Secret.
+  # In order to move sensitive information (such as credentials) from the ConfigMap/Secret to a more secure location (e.g. vault), it is possible to use [environment variables in the configuration](https://grafana.com/docs/mimir/latest/operators-guide/configuring/reference-configuration-parameters/#use-environment-variables-in-the-configuration).
+  # Such environment variables can be then stored in a separate Secret and injected via the global.extraEnvFrom value. For details about environment injection from a Secret please see [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/#use-case-as-container-environment-variables).
+  storageType: ConfigMap
+
+  # -- Name of the Secret or ConfigMap that contains the configuration (used for naming even if config is internal).
+  externalSecretName: '{{ include "deep.resourceName" (dict "ctx" . "component" "config") }}'
+
+  multitenancyEnabled: true
+
+  # -- Structured deep configuration
+  structuredConfig: {}
+
+  deep: |
+    multitenancy_enabled: {{ .Values.config.multitenancyEnabled }}
+
+    compactor:
+      {{- if .Values.compactor.config }}
+        {{- toYaml .Values.compactor.config | nindent 2 }}
+      {{- end }}
+
+    distributor:
+      {{- if .Values.distributor.config }}
+        {{- toYaml .Values.distributor.config | nindent 2 }}
+      {{- end }}
+
+    querier:
+      {{- if .Values.querier.config }}
+        {{- toYaml .Values.querier.config | nindent 2 }}
+      {{- end }}
+
+    query_frontend:
+      {{- if .Values.queryFrontend.config }}
+        {{- toYaml .Values.queryFrontend.config | nindent 2 }}
+      {{- end }}
+
+    ingester:
+      {{- if .Values.ingester.config }}
+        {{- toYaml .Values.ingester.config | nindent 2 }}
+      {{- end }}
+
+
+    overrides:
+      {{- toYaml .Values.global_overrides | nindent 2 }}
+      {{- if .Values.metricsGenerator.enabled }}
+      metrics_generator_processors:
+      {{- range .Values.global_overrides.metrics_generator_processors }}
+      - {{ . }}
+      {{- end }}
+      {{- end }}
+
+    server:
+      http_listen_port: {{ .Values.server.httpListenPort }}
+      log_level: {{ .Values.server.logLevel }}
+      log_format: {{ .Values.server.logFormat }}
+      grpc_server_max_recv_msg_size: {{ .Values.server.grpc_server_max_recv_msg_size }}
+      grpc_server_max_send_msg_size: {{ .Values.server.grpc_server_max_send_msg_size }}
+      http_server_read_timeout: {{ .Values.server.http_server_read_timeout }}
+      http_server_write_timeout: {{ .Values.server.http_server_write_timeout }}
+
+    storage:
+      {{- if .Values.storage }}
+        {{- toYaml .Values.storage | nindent 2 }}
+      {{- end }}
+
+serviceAccount:
+  # -- Specifies whether a ServiceAccount should be created
+  create: true
+  # -- The name of the ServiceAccount to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: null
+  # -- Image pull secrets for the service account
+  imagePullSecrets: []
+  # -- Annotations for the service account
+  annotations: {}
+  # -- Labels for the service account
+  labels: {}
+  automountServiceAccountToken: true
+
+metaMonitoring:
+  # ServiceMonitor configuration
+  serviceMonitor:
+    # -- If enabled, ServiceMonitor resources for Prometheus Operator are created
+    enabled: true
+    # -- Alternative namespace for ServiceMonitor resources
+    namespace: null
+    # -- Namespace selector for ServiceMonitor resources
+    namespaceSelector: {}
+    # -- ServiceMonitor annotations
+    annotations: {}
+    # -- Additional ServiceMonitor labels
+    labels: {}
+    # -- ServiceMonitor scrape interval
+    interval: null
+    # -- ServiceMonitor scrape timeout in Go duration format (e.g. 15s)
+    scrapeTimeout: null
+    # -- ServiceMonitor relabel configs to apply to samples before scraping
+    # https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#relabelconfig
+    relabelings: []
+    # -- ServiceMonitor metric relabel configs to apply to samples before ingestion
+    # https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#endpoint
+    metricRelabelings: []
+    # -- ServiceMonitor will use http by default, but you can pick https as well
+    scheme: http
+    # -- ServiceMonitor will use these tlsConfig settings to make the health check requests
+    tlsConfig: null

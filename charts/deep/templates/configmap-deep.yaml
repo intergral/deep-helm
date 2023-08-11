@@ -1,0 +1,21 @@
+{{- if not .Values.config.useExternalConfig }}
+apiVersion: v1
+{{- if eq .Values.config.storageType "Secret" }}
+kind: Secret
+{{- else }}
+kind: ConfigMap
+{{- end }}
+metadata:
+  name: {{ tpl .Values.config.externalSecretName . }}
+  labels:
+    {{- include "deep.labels" (dict "ctx" .) | nindent 4 }}
+  namespace: {{ .Release.Namespace | quote }}
+{{- if eq .Values.config.storageType "Secret" }}
+data:
+  deep.yaml: {{ include "deep.calculatedConfig" . | b64enc }}
+{{- else }}
+data:
+  deep.yaml: |
+    {{ include "deep.calculatedConfig" . | nindent 4 }}
+{{- end -}}
+{{- end }}

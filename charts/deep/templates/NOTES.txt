@@ -1,0 +1,11 @@
+***********************************************************************
+Welcome to Intergral Deep
+Chart version: {{ .Chart.Version }}
+Deep version: {{ .Chart.AppVersion }}
+***********************************************************************
+
+Installed components:
+  * deep ({{.Values.deep.replicas}})
+{{- if .Values.service.enabled}}
+  * service {{- if .Values.service.ingress.enabled}}{{- with (index .Values.service.ingress.hosts 0)}} {{.host}}{{- end}}{{- end}}
+{{- end}}

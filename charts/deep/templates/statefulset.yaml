@@ -1,0 +1,129 @@
+{{ $dict := dict "ctx" . "component" "single-binary" }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "deep.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "deep.labels" $dict | nindent 4 }}
+  {{- with .Values.deep.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.deep.replicas }}
+  {{- if .Values.deep.revisionHistoryLimit }}
+  revisionHistoryLimit: {{ .Values.deep.revisionHistoryLimit }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "deep.selectorLabels" $dict | nindent 6 }}
+  serviceName: {{ template "deep.fullname" . }}-headless
+  template:
+    metadata:
+      labels:
+        {{- include "deep.selectorLabels" $dict | nindent 8 }}
+        {{- with .Values.deep.podLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap-deep.yaml") . | sha256sum }}
+        {{- with .Values.deep.podAnnotations }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "deep.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
+      {{- with .Values.deep.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
+      containers:
+      - args:
+        - -config.file=/conf/deep.yaml
+        - -mem-ballast-size-mbs={{ .Values.deep.memBallastSizeMbs }}
+        {{- range $key, $value := .Values.deep.extraArgs }}
+        - "-{{ $key }}{{ if $value }}={{ $value }}{{ end }}"
+        {{- end }}
+        image: "{{.Values.global.image.registry}}/{{ .Values.global.image.repository }}:{{ .Values.global.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+        name: deep
+        ports:
+        - containerPort: 3100
+          name: prom-metrics
+        - containerPort: 43315
+          name: deep-grpc
+        resources:
+          {{- toYaml .Values.deep.resources | nindent 10 }}
+        {{- with .Values.deep.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        env:
+          {{- with .Values.deep.extraEnv }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+        {{- with .Values.deep.extraEnvFrom }}
+        envFrom:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        volumeMounts:
+        {{- if .Values.deep.extraVolumeMounts -}}
+          {{ toYaml .Values.deep.extraVolumeMounts | nindent 8 }}
+        {{- end }}
+        - mountPath: /conf
+          name: deep-conf
+        - mountPath: /runtime-config
+          name: deep-runtime-conf
+        {{- if .Values.deep.persistence.enabled }}
+        - mountPath: /var/deep
+          name: storage
+        {{- end }}
+        {{- if .Values.metricsGenerator.enabled }}
+        - mountPath: /tmp
+          name: tmp
+        {{- end }}
+      {{- with .Values.deep.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.deep.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.deep.securityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.deep.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        {{- if .Values.deep.extraVolumes -}}
+          {{ toYaml .Values.deep.extraVolumes | nindent 6 }}
+        {{- end }}
+        - name: deep-conf
+        {{- include "deep.configVolume" . | nindent 10 }}
+        - name: deep-runtime-conf
+        {{- include "deep.runtimeVolume" . | nindent 10 }}
+        {{- if .Values.metricsGenerator.enabled }}
+        - name: tmp
+          emptyDir: {}
+      {{- end }}
+  updateStrategy:
+    type: {{- toYaml .Values.deep.updateStrategy | nindent 6 }}
+  {{- if .Values.deep.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: storage
+        annotations: {{- toYaml .Values.deep.persistence.annotations | nindent 10 }}
+      spec:
+        accessModes: {{- toYaml .Values.deep.persistence.accessModes | nindent 10 }}
+        resources:
+          requests:
+            storage: {{ .Values.deep.persistence.size | quote }}
+        storageClassName: {{ .Values.deep.persistence.storageClassName }}
+        {{- if .Values.deep.persistence.selector }}
+        selector: {{- toYaml .Values.deep.persistence.selector | nindent 10 }}
+        {{- end }}
+  {{- end }}
