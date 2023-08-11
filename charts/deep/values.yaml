@@ -102,8 +102,6 @@ service:
         hosts:
           - gateway.deep.example.com
 
-
-
 compactor:
   config:
     compaction:
@@ -341,4 +339,3 @@ metaMonitoring:
     scheme: http
     # -- ServiceMonitor will use these tlsConfig settings to make the health check requests
     tlsConfig: null
-
