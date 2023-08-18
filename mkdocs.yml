@@ -1,7 +1,8 @@
 repo_name: Deep Helm Charts
 repo_url: https://github.com/intergral/deep-helm
 
-site_dir: docs_out
+docs_dir: docs_out
+site_dir: _site
 
 site_name: Deep Helm Charts
 site_url: https://intergral.github.io/deep-helm/
