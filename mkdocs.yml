@@ -1,0 +1,26 @@
+repo_name: Deep Helm Charts
+repo_url: https://github.com/intergral/deep-helm
+
+site_dir: docs_out
+
+site_name: Deep Helm Charts
+site_url: https://intergral.github.io/deep-helm/
+
+copyright: Intergral GmbH 2023
+
+theme:
+  logo: https://raw.githubusercontent.com/intergral/deep/master/docs/docs/images/logo/logo.svg
+  favicon: https://raw.githubusercontent.com/intergral/deep/master/docs/docs/images/logo/logo.svg
+  name: material
+  features:
+    - content.code.copy
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+

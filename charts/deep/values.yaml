@@ -1,12 +1,16 @@
 # Default values for deep.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+
+## General config that affect all parts of the chart
 global:
+  ## define the default image config for all containers
   image:
-    # define the default image config for all containers
     registry: docker.io
     repository: intergral/deep
     tag: null
+    # The name of the secret to use to pull the image
+    # - github-pull-secret
     pullSecrets: []
     pullPolicy: IfNotPresent
   # -- Overrides the priorityClassName for all pods
@@ -22,6 +26,8 @@ nameOverride: ""
 fullnameOverride: ""
 namespace: "deep"
 
+## Define the config specific to the deployment of deep
+## Including, replicas, annotations, environments etc
 deep:
   replicas: 1
   annotations: {}
@@ -192,24 +198,24 @@ storage:
 metricsGenerator:
   enabled: false
 
-# Global overrides
+## Global overrides
 global_overrides:
   per_tenant_override_config: /runtime-config/overrides.yaml
   metrics_generator_processors: []
 
 
-# Per tenants overrides
+## Per tenants overrides
 overrides:
-  # -- Configuration is loaded from the secret called 'externalConfigSecretName'.
-  # If 'useExternalConfig' is true, then the configuration is not generated, just
-  # consumed.
+  ## Configuration is loaded from the secret called 'externalConfigSecretName'.
+  ## If 'useExternalConfig' is true, then the configuration is not generated, just
+  ## consumed.
   useExternalConfig: false
   # -- Name of the Secret or ConfigMap that contains the runtime configuration (used for naming even if config is internal).
   externalRuntimeConfigName: '{{ include "deep.resourceName" (dict "ctx" . "component" "runtime") }}'
   overrides: |
     overrides: {}
 
-# Set Deep server configuration
+## Set Deep server configuration
 server:
   # --  HTTP server listen host
   httpListenPort: 3100
@@ -226,7 +232,7 @@ server:
   # -- Write timeout for HTTP server
   http_server_write_timeout: 30s
 
-# define the config for deep
+## define the config for deep
 config:
   # -- Configuration is loaded from the secret called 'externalConfigSecretName'.
   # If 'useExternalConfig' is true, then the configuration is not generated, just
@@ -272,6 +278,11 @@ config:
     ingester:
       {{- if .Values.ingester.config }}
         {{- toYaml .Values.ingester.config | nindent 2 }}
+      {{- end }}
+
+    tracepoint:
+      {{- if .Values.tracepoint.config }}
+        {{- toYaml .Values.tracepoint.config | nindent 2 }}
       {{- end }}
 
 

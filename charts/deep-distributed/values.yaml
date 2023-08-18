@@ -47,7 +47,8 @@ deep:
         - ALL
     readOnlyRootFilesystem: true
   memberlist:
-    # -- Adds the appProtocol field to the memberlist service. This allows memberlist to work with istio protocol selection. Set the optional service protocol. Ex: "tcp", "http" or "https".
+    # -- Adds the appProtocol field to the memberlist service. This allows memberlist to work with
+    # istio protocol selection. Set the optional service protocol. Ex: "tcp", "http" or "https".
     appProtocol: null
 
 compactor:
