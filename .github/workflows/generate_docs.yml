@@ -3,9 +3,7 @@ name: Generate Docs
 on:
   push:
     branches:
-      - gh-pages # only need to update docs when index changes
-    paths:
-      - index.yaml
+      - master
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
