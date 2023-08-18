@@ -280,12 +280,6 @@ config:
         {{- toYaml .Values.ingester.config | nindent 2 }}
       {{- end }}
 
-    tracepoint:
-      {{- if .Values.tracepoint.config }}
-        {{- toYaml .Values.tracepoint.config | nindent 2 }}
-      {{- end }}
-
-
     overrides:
       {{- toYaml .Values.global_overrides | nindent 2 }}
       {{- if .Values.metricsGenerator.enabled }}
