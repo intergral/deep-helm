@@ -35,7 +35,7 @@ jobs:
       - run: pip install helm_mkdocs mkdocs-material
       - run: |
           helm-mkdocs ./charts/deep -o docs_out/deep
-          helm-mkdocs ./charts/deep-distributed -o docs_out/deep
+          helm-mkdocs ./charts/deep-distributed -o docs_out/deep-distributed
       - run: cp README.md docs_out/index.md
       - run: mkdocs build
       - name: Download index
@@ -45,4 +45,15 @@ jobs:
       - run: cp index.yaml _site/index.yaml
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
+
+  deploy:
+    needs: build_docs
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
 
