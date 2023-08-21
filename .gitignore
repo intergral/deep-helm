@@ -85,3 +85,6 @@ index.yaml
 pages
 
 **/*/.values.yaml
+
+_site
+docs_out

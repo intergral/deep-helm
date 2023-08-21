@@ -1,0 +1,12 @@
+storage:
+  tracepoint:
+    backend: s3
+    s3:
+      bucket: deep-storage
+      region: eu-west-1
+      endpoint: s3.dualstack.eu-west-1.amazonaws.com
+
+deep:
+  extraEnvFrom:
+    - secretRef:
+        name: aws-s3-cred
