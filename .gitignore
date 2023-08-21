@@ -88,3 +88,5 @@ pages
 
 _site
 docs_out
+
+charts/**/unittests/__snapshot__/
