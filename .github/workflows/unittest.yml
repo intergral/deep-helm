@@ -1,0 +1,16 @@
+name: Helm Lint
+
+on:
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: helm plugin install https://github.com/helm-unittest/helm-unittest.git
+      - name: Helm unittest
+        run: |
+          helm unittest ${GITHUB_WORKSPACE}/charts/deep
+          helm unittest ${GITHUB_WORKSPACE}/charts/deepa-distributed

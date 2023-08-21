@@ -1,0 +1,27 @@
+suite: test statefulset
+templates:
+  - statefulset.yaml
+  - configmap-deep.yaml
+chart:
+  version: 9.9.9+test
+  appVersion: 1.1.1+test
+tests:
+  - it: should create correct statefulset
+    template: statefulset.yaml
+    asserts:
+      - isKind:
+          of: StatefulSet
+      - matchRegex:
+          path: metadata.name
+          pattern: -deep$
+  - it: should create correct pod
+    template: statefulset.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: docker.io/intergral/deep:1.1.1+test
+  - it: should create configmap
+    template: configmap-deep.yaml
+    asserts:
+      - isKind:
+          of: ConfigMap
