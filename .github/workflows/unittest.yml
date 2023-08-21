@@ -12,5 +12,5 @@ jobs:
       - run: helm plugin install https://github.com/helm-unittest/helm-unittest.git
       - name: Helm unittest
         run: |
-          helm unittest ${GITHUB_WORKSPACE}/charts/deep
-          helm unittest ${GITHUB_WORKSPACE}/charts/deepa-distributed
+          helm unittest -f unittests/*_test.yaml ${GITHUB_WORKSPACE}/charts/deep
+          helm unittest -f unittests/*_test.yaml ${GITHUB_WORKSPACE}/charts/deepa-distributed

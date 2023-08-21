@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "deep.fullname" . }}-test-connection"
+  namespace: {{ .Release.Namespace | quote }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: [ 'wget' ]
+      args: [ '{{ include "deep.fullname" . }}:3100/api/echo' ]
+  restartPolicy: Never

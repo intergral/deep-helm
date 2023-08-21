@@ -89,4 +89,4 @@ pages
 _site
 docs_out
 
-charts/**/tests/__snapshot__/
+charts/**/unittests/__snapshot__/

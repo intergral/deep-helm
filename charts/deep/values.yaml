@@ -119,8 +119,6 @@ service:
   annotations: {}
   # Custom labels to apply to the service
   labels: {}
-  # The port this service should use
-  port: 80
   # Configuration for ingress
   ingress:
     # -- Specifies whether an ingress for the gateway should be created
