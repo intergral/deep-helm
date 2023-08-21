@@ -18,8 +18,11 @@ global:
   # -- configures DNS service namespace
   dnsNamespace: 'kube-system'
 
+## Lets you override the name used for this chart, will default to 'deep'.
 nameOverride: ""
+## Lets you override the full name used by this chart.
 fullnameOverride: ""
+## Lets you set the namespace to use when deploying, or upgrading deep.
 namespace: "deep"
 
 deep:
