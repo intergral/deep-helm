@@ -40,7 +40,7 @@ spec:
       containers:
       - args:
         - -config.file=/conf/deep.yaml
-        - -mem-ballast-size-mbs={{ .Values.deep.memBallastSizeMbs }}
+        - -mem-ballast-size-mbs={{ .Values.deep.config.memBallastSizeMbs }}
         {{- range $key, $value := .Values.deep.extraArgs }}
         - "-{{ $key }}{{ if $value }}={{ $value }}{{ end }}"
         {{- end }}
