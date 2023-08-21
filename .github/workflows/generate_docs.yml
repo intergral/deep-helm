@@ -36,7 +36,8 @@ jobs:
       - run: |
           helm-mkdocs ./charts/deep -o docs_out/deep
           helm-mkdocs ./charts/deep-distributed -o docs_out/deep-distributed
-      - run: cp README.md styles.css docs_out/index.md
+      - run: cp README.md docs_out/index.md
+      - run: cp styles.css docs_out/styles.css
       - run: mkdocs build
       - name: Download index
         uses: actions/download-artifact@v3
