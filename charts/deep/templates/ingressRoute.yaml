@@ -1,0 +1,36 @@
+{{- if .Values.service.enabled -}}
+{{- if .Values.service.traefik.enabled -}}
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ template "deep.fullname" . }}
+  labels:
+    {{- include "deep.labels" (dict "ctx" . "component" "gateway") | nindent 4 }}
+  {{- with .Values.service.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  entryPoints: {{- with .Values.service.traefik.entryPoints }}
+    {{- toYaml . | nindent 4}}
+  {{- end }}
+  routes:
+  {{- range .Values.service.traefik.routes }}
+    - match: {{ tpl .match $ }}
+      kind: Rule
+      {{- if .middlewares }}
+      middlewares: {{- with .middlewares }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- end }}
+      services:
+      {{- range .services }}
+        - name: {{ tpl (.name | toString) $ }}
+          port: {{ .port }}
+          {{- if .scheme }}
+          scheme: {{ .scheme }}
+          {{- end }}
+      {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
