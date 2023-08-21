@@ -122,7 +122,7 @@ service:
   # config for using traefik 'IngressRoute'
   traefik:
     # -- Specified whether an IngressRoute should be created
-    enabled: true
+    enabled: false
     host: gateway.deep.example.com
     # -- Specify the entry points for traefik
     entryPoints:
