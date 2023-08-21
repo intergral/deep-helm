@@ -13,4 +13,4 @@ jobs:
       - name: Helm unittest
         run: |
           helm unittest -f unittests/*_test.yaml ${GITHUB_WORKSPACE}/charts/deep
-          helm unittest -f unittests/*_test.yaml ${GITHUB_WORKSPACE}/charts/deepa-distributed
+          helm unittest -f unittests/*_test.yaml ${GITHUB_WORKSPACE}/charts/deep-distributed
