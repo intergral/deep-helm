@@ -119,6 +119,26 @@ service:
   annotations: {}
   # Custom labels to apply to the service
   labels: {}
+  # config for using traefik 'IngressRoute'
+  traefik:
+    # -- Specified whether an IngressRoute should be created
+    enabled: true
+    host: gateway.deep.example.com
+    # -- Specify the entry points for traefik
+    entryPoints:
+      - websecure
+    routes:
+      - match: Host(`{{ .Values.service.traefik.host }}`) && PathPrefix(`/deepproto.proto`)
+        kind: Rule
+        services:
+          - name: '{{ include "deep.fullname" . }}'
+            port: 43315
+            scheme: h2c
+      - match: Host(`{{ .Values.service.traefik.host }}`)
+        kind: Rule
+        services:
+          - name: '{{ include "deep.fullname" . }}'
+            port: 3100
   # Configuration for ingress
   ingress:
     # -- Specifies whether an ingress for the gateway should be created

@@ -5,6 +5,9 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "deep.labels" (dict "ctx" .) | nindent 4 }}
+    {{- with .Values.service.labels }}
+        {{- toYaml . | nindent 4 }}
+    {{- end}}
   {{- with .Values.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -32,7 +35,7 @@ spec:
   {{- end }}
 {{- end }}
   ports:
-  - name: prom-metrics
+  - name: api
     port: 3100
     targetPort: 3100
   - name: deep-grpc
