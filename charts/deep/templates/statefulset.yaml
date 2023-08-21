@@ -49,7 +49,7 @@ spec:
         name: deep
         ports:
         - containerPort: 3100
-          name: prom-metrics
+          name: api
         - containerPort: 43315
           name: deep-grpc
         resources:

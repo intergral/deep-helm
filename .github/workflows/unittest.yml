@@ -1,4 +1,4 @@
-name: Helm Lint
+name: Helm Unit Test
 
 on:
   pull_request:
