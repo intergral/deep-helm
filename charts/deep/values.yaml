@@ -144,7 +144,7 @@ service:
         port: 3100
     # -- Hosts configuration for the gateway ingress
     hosts:
-      - host: gateway.deep.example.com # the host name to use in the ingress controller
+      - host: gateway.deep.example.com  # the host name to use in the ingress controller
         ## The paths to use for this host
         paths: []
     # -- TLS configuration for the gateway ingress
