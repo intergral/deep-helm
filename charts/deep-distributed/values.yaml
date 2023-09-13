@@ -17,6 +17,8 @@ global:
   dnsService: 'kube-dns'
   # -- configures DNS service namespace
   dnsNamespace: 'kube-system'
+  ## Node selector for all pods
+  nodeSelector: {}
 
 ## Lets you override the name used for this chart, will default to 'deep'.
 nameOverride: ""
@@ -436,7 +438,7 @@ tracepoint:
     grpc: null
   config:
     api:
-      frontend_worker:
+      worker:
         frontend_address: '{{ include "deep.resourceName" (dict "ctx" . "component" "query-frontend-discovery") }}:9095'
 
 queryFrontend:
@@ -830,6 +832,11 @@ config:
       join_members:
         - dns+{{ include "deep.fullname" . }}-gossip-ring:{{ .Values.memberlist.bind_port }}
 
+    tracepoint:
+      {{- with .Values.tracepoint.config }}
+        {{- toYaml . | nindent 2 }}
+      {{- end }}
+
     overrides:
       {{- toYaml .Values.global_overrides | nindent 2 }}
       {{- if .Values.metricsGenerator.enabled }}
@@ -996,6 +1003,26 @@ gateway:
     labels: {}
     # -- Additional ports to be opneed on gateway service (e.g. for RPC connections)
     additionalPorts: {}
+  # config for using traefik 'IngressRoute'
+  traefik:
+    # -- Specified whether an IngressRoute should be created
+    enabled: false
+    host: gateway.deep.example.com
+    # -- Specify the entry points for traefik
+    entryPoints:
+      - websecure
+    routes:
+      - match: Host(`{{ .Values.gateway.traefik.host }}`) && PathPrefix(`/deepproto.proto`)
+        kind: Rule
+        services:
+          - name: '{{ include "deep.fullname" . }}-distributor'
+            port: 43315
+            scheme: h2c
+      - match: Host(`{{ .Values.gateway.traefik.host }}`)
+        kind: Rule
+        services:
+          - name: '{{ include "deep.fullname" . }}-gateway'
+            port: 80
   # Gateway ingress configuration
   ingress:
     # -- Specifies whether an ingress for the gateway should be created
@@ -1127,11 +1154,15 @@ gateway:
           }
 
           location = /ingester/ring {
-            proxy_pass       http://{{ include "deep.resourceName" (dict "ctx" . "component" "distributor") }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:3100$request_uri;
+            proxy_pass       http://{{ include "deep.resourceName" (dict "ctx" . "component" "ingester") }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:3100$request_uri;
           }
 
           location = /compactor/ring {
             proxy_pass       http://{{ include "deep.resourceName" (dict "ctx" . "component" "compactor") }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:3100$request_uri;
+          }
+
+          location = /tracepoint/ring {
+            proxy_pass       http://{{ include "deep.resourceName" (dict "ctx" . "component" "tracepoint") }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:3100$request_uri;
           }
 
           {{- with .Values.gateway.nginxConfig.serverSnippet }}

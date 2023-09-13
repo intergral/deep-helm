@@ -58,7 +58,7 @@ spec:
       {{- end }}
       containers:
         - args:
-            - -target=tracepoint
+            - -target=tracepoint-api
             - -config.file=/conf/deep.yaml
             - -mem-ballast-size-mbs=1024
             {{- with .Values.tracepoint.extraArgs }}
@@ -112,7 +112,7 @@ spec:
       affinity:
         {{- tpl . $ | nindent 8 }}
       {{- end }}
-      {{- with .Values.tracepoint.nodeSelector }}
+      {{- with or .Values.tracepoint.nodeSelector .Values.global.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}

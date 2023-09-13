@@ -112,7 +112,7 @@ spec:
       affinity:
         {{- tpl . $ | nindent 8 }}
       {{- end }}
-      {{- with .Values.querier.nodeSelector }}
+      {{- with or .Values.querier.nodeSelector .Values.global.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
