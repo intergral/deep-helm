@@ -1,7 +1,4 @@
 suite: test statefulset
-templates:
-  - statefulset.yaml
-  - configmap-deep.yaml
 chart:
   version: 9.9.9+test
   appVersion: 1.1.1+test
