@@ -1,4 +1,4 @@
-{{ $dict := dict "ctx" . "component" "tracepoint" "memberlist" true }}
+{{ $dict := dict "ctx" . "component" "tracepoint-api" "memberlist" true }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,14 +6,14 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "deep.labels" $dict | nindent 4 }}
-  {{- with .Values.tracepoint.annotations }}
+  {{- with .Values.tracepointApi.annotations }}
   annotations:
   {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
   minReadySeconds: 10
-{{- if not .Values.tracepoint.autoscaling.enabled }}
-  replicas: {{ .Values.tracepoint.replicas }}
+{{- if not .Values.tracepointApi.autoscaling.enabled }}
+  replicas: {{ .Values.tracepointApi.replicas }}
 {{- end }}
   revisionHistoryLimit: 10
   selector:
@@ -30,7 +30,7 @@ spec:
         {{- with .Values.deep.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- with .Values.tracepoint.podLabels }}
+        {{- with .Values.tracepointApi.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
       annotations:
@@ -38,12 +38,12 @@ spec:
         {{- with .Values.deep.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- with .Values.tracepoint.podAnnotations }}
+        {{- with .Values.tracepointApi.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- if or (.Values.tracepoint.priorityClassName) (.Values.global.priorityClassName) }}
-      priorityClassName: {{ default .Values.tracepoint.priorityClassName .Values.global.priorityClassName }}
+      {{- if or (.Values.tracepointApi.priorityClassName) (.Values.global.priorityClassName) }}
+      priorityClassName: {{ default .Values.tracepointApi.priorityClassName .Values.global.priorityClassName }}
       {{- end }}
       serviceAccountName: {{ include "deep.serviceAccountName" . }}
       {{- with .Values.deep.podSecurityContext }}
@@ -52,16 +52,16 @@ spec:
       {{- end }}
       enableServiceLinks: false
       {{- include "deep.tracepointImagePullSecrets" . | nindent 6 -}}
-      {{- with .Values.tracepoint.hostAliases }}
+      {{- with .Values.tracepointApi.hostAliases }}
       hostAliases:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
         - args:
-            - -target=tracepoint
+            - -target=tracepoint-api
             - -config.file=/conf/deep.yaml
             - -mem-ballast-size-mbs=1024
-            {{- with .Values.tracepoint.extraArgs }}
+            {{- with .Values.tracepointApi.extraArgs }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
           image: {{ include "deep.imageReference" $dict }}
@@ -73,16 +73,16 @@ spec:
               protocol: TCP
             - containerPort: 3100
               name: http-metrics
-          {{- with .Values.tracepoint.extraEnv }}
+          {{- with .Values.tracepointApi.extraEnv }}
           env:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.tracepoint.extraEnvFrom }}
+          {{- with .Values.tracepointApi.extraEnvFrom }}
           envFrom:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           resources:
-            {{- toYaml .Values.tracepoint.resources | nindent 12 }}
+            {{- toYaml .Values.tracepointApi.resources | nindent 12 }}
           {{- with .Values.deep.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
@@ -98,25 +98,25 @@ spec:
               name: runtime-config
             - mountPath: /var/deep
               name: deep-tracepoint-store
-            {{- with .Values.tracepoint.extraVolumeMounts }}
+            {{- with .Values.tracepointApi.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-      terminationGracePeriodSeconds: {{ .Values.tracepoint.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.tracepointApi.terminationGracePeriodSeconds }}
       {{- if ge (.Capabilities.KubeVersion.Minor|int) 19 }}
-      {{- with .Values.tracepoint.topologySpreadConstraints }}
+      {{- with .Values.tracepointApi.topologySpreadConstraints }}
       topologySpreadConstraints:
         {{- tpl . $ | nindent 8 }}
       {{- end }}
       {{- end }}
-      {{- with .Values.tracepoint.affinity }}
+      {{- with .Values.tracepointApi.affinity }}
       affinity:
         {{- tpl . $ | nindent 8 }}
       {{- end }}
-      {{- with or .Values.tracepoint.nodeSelector .Values.global.nodeSelector }}
+      {{- with or .Values.tracepointApi.nodeSelector .Values.global.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.tracepoint.tolerations }}
+      {{- with .Values.tracepointApi.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -127,6 +127,6 @@ spec:
           {{- include "deep.runtimeVolume" . | nindent 10 }}
         - name: deep-tracepoint-store
           emptyDir: {}
-        {{- with .Values.tracepoint.extraVolumes }}
+        {{- with .Values.tracepointApi.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

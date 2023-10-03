@@ -441,6 +441,96 @@ tracepoint:
       worker:
         frontend_address: '{{ include "deep.resourceName" (dict "ctx" . "component" "query-frontend-discovery") }}:9095'
 
+tracepointApi:
+  # -- Number of replicas for the tracepoint api
+  replicas: 1
+  # -- hostAliases to add
+  hostAliases: []
+  #  - ip: 1.2.3.4
+  #    hostnames:
+  #      - domain.tld
+  autoscaling:
+    # -- Enable autoscaling for the  tracepoint api
+    enabled: false
+    # -- Minimum autoscaling replicas for the  tracepoint api
+    minReplicas: 1
+    # -- Maximum autoscaling replicas for the  tracepoint api
+    maxReplicas: 3
+    # -- Autoscaling behavior configuration for the  tracepoint api
+    behavior: {}
+    # -- Target CPU utilisation percentage for the  tracepoint api
+    targetCPUUtilizationPercentage: 60
+    # -- Target memory utilisation percentage for the  tracepoint api
+    targetMemoryUtilizationPercentage:
+  image:
+    # -- The Docker registry for the  tracepoint api image. Overrides `deep.image.registry`
+    registry: null
+    # -- Optional list of imagePullSecrets. Overrides `deep.image.pullSecrets`
+    pullSecrets: []
+    # -- Docker image repository for the  tracepoint api image. Overrides `deep.image.repository`
+    repository: null
+    # -- Docker image tag for the  tracepoint api image. Overrides `deep.image.tag`
+    tag: null
+  # -- The name of the PriorityClass for  tracepoint api pods
+  priorityClassName: null
+  # -- Annotations for the  tracepoint api deployment
+  annotations: {}
+  # -- Labels for  tracepoint api pods
+  podLabels: {}
+  # -- Annotations for  tracepoint api pods
+  podAnnotations: {}
+  # -- Additional CLI args for the  tracepoint api
+  extraArgs: []
+  # -- Environment variables to add to the  tracepoint api pods
+  extraEnv: []
+  # -- Environment variables from secrets or configmaps to add to the  tracepoint api pods
+  extraEnvFrom: []
+  # -- Resource requests and limits for the  tracepoint api
+  resources: {}
+  # -- Grace period to allow the  tracepoint api to shutdown before it is killed
+  terminationGracePeriodSeconds: 30
+  # -- topologySpread for  tracepoint api pods. Passed through `tpl` and, thus, to be configured as string
+  # @default -- Defaults to allow skew no more then 1 node per AZ
+  topologySpreadConstraints: |
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          {{- include "deep.selectorLabels" (dict "ctx" . "component" "tracepoint-api") | nindent 6 }}
+  # -- Affinity for  tracepoint api pods. Passed through `tpl` and, thus, to be configured as string
+  # @default -- Hard node and soft zone anti-affinity
+  affinity: |
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              {{- include "deep.selectorLabels" (dict "ctx" . "component" "tracepoint-api" "memberlist" true) | nindent 10 }}
+          topologyKey: kubernetes.io/hostname
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                {{- include "deep.selectorLabels" (dict "ctx" . "component" "tracepoint-api" "memberlist" true) | nindent 12 }}
+            topologyKey: topology.kubernetes.io/zone
+  # -- Node selector for  tracepoint api pods
+  nodeSelector: {}
+  # -- Tolerations for  tracepoint api pods
+  tolerations: []
+  # -- Extra volumes for  tracepoint api pods
+  extraVolumeMounts: []
+  # -- Extra volumes for  tracepoint api deployment
+  extraVolumes: []
+  service:
+    # -- Annotations for  tracepoint api service
+    annotations: {}
+  # -- Adds the appProtocol field to the  tracepoint api service. This allows  tracepoint api to work with istio protocol selection.
+  appProtocol:
+    # -- Set the optional grpc service protocol. Ex: "grpc", "http2" or "https"
+    grpc: null
+
+
 queryFrontend:
   # -- Number of replicas for the query-frontend
   replicas: 1
@@ -1066,6 +1156,11 @@ gateway:
     initialDelaySeconds: 15
     timeoutSeconds: 1
   nginxConfig:
+    includeStatus: false
+    statusConfig: |-
+      location ^~ /status {
+        proxy_pass http://{{ include "deep.resourceName" (dict "ctx" . "component" "query-frontend") }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:3100$request_uri;
+      }
     # -- NGINX log format
     logFormat: |-
       main '$remote_addr - $remote_user [$time_local]  $status '
@@ -1154,7 +1249,7 @@ gateway:
           }
 
           location = /ingester/ring {
-            proxy_pass       http://{{ include "deep.resourceName" (dict "ctx" . "component" "ingester") }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:3100$request_uri;
+            proxy_pass       http://{{ include "deep.resourceName" (dict "ctx" . "component" "distributor") }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:3100$request_uri;
           }
 
           location = /compactor/ring {
@@ -1162,8 +1257,12 @@ gateway:
           }
 
           location = /tracepoint/ring {
-            proxy_pass       http://{{ include "deep.resourceName" (dict "ctx" . "component" "tracepoint") }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:3100$request_uri;
+            proxy_pass       http://{{ include "deep.resourceName" (dict "ctx" . "component" "tracepoint-api") }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:3100$request_uri;
           }
+      
+          {{- if .Values.gateway.nginxConfig.includeStatus }}
+          {{ tpl .Values.gateway.nginxConfig.statusConfig . | nindent 4 }}
+          {{- end }}
 
           {{- with .Values.gateway.nginxConfig.serverSnippet }}
           {{ . | nindent 4 }}
