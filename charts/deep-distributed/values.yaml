@@ -1259,7 +1259,7 @@ gateway:
           location = /tracepoint/ring {
             proxy_pass       http://{{ include "deep.resourceName" (dict "ctx" . "component" "tracepoint-api") }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:3100$request_uri;
           }
-      
+
           {{- if .Values.gateway.nginxConfig.includeStatus }}
           {{ tpl .Values.gateway.nginxConfig.statusConfig . | nindent 4 }}
           {{- end }}
