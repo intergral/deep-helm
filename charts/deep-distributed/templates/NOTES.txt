@@ -9,6 +9,7 @@ Installed components:
 * distributor ({{.Values.distributor.replicas}})
 * querier ({{.Values.querier.replicas}})
 * tracepoint ({{.Values.tracepoint.replicas}})
+* tracepoint-api ({{.Values.tracepointApi.replicas}})
 * query-frontend ({{.Values.queryFrontend.replicas}})
 * compactor ({{.Values.compactor.replicas}})
 {{- if .Values.gateway.enabled}}

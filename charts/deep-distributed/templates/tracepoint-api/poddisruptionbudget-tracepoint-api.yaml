@@ -1,0 +1,14 @@
+{{- if gt (int .Values.querier.replicas) 1 }}
+{{ $dict := dict "ctx" . "component" "tracepoint-api" "memberlist" true }}
+apiVersion: {{ include "deep.pdb.apiVersion" . }}
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "deep.resourceName" $dict }}
+  labels:
+    {{- include "deep.labels" $dict | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "deep.selectorLabels" $dict | nindent 6 }}
+  maxUnavailable: 1
+{{- end }}
