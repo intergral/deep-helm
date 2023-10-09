@@ -444,4 +444,4 @@ monitoring:
     annotations: {}
     # additional labels to add to the dashboards
     labels:
-      grafana_dashboard: 1
+      grafana_dashboard: "1"
