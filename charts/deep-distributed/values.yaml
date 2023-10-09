@@ -1004,7 +1004,7 @@ monitoring:
     annotations: {}
     # additional labels to add to the dashboards
     labels:
-      grafana_dashboard: grafana_dashboard
+      grafana_dashboard: 1
 
 # Configuration for the gateway
 gateway:
