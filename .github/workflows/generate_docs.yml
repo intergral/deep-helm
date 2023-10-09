@@ -1,6 +1,11 @@
 name: Generate Docs
 
 on:
+  workflow_run:
+    workflows:
+      - Release Charts
+    types:
+      - completed
   release:
     types:
       - released
