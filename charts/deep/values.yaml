@@ -434,3 +434,14 @@ monitoring:
     scheme: http
     # -- ServiceMonitor will use these tlsConfig settings to make the health check requests
     tlsConfig: null
+  # This controls the config for provided dashboards
+  dashboards:
+    # if enabled the dashboards will be provided
+    enabled: false
+    # The namespace to deploy the dashboards in
+    namespace: null
+    # Additional annotations to add to the dashboards
+    annotations: {}
+    # additional labels to add to the dashboards
+    labels:
+      grafana_dashboard: grafana_dashboard

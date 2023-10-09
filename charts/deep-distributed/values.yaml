@@ -998,8 +998,11 @@ monitoring:
   dashboards:
     # if enabled the dashboards will be provided
     enabled: false
+    # The namespace to deploy the dashboards in
     namespace: null
+    # Additional annotations to add to the dashboards
     annotations: {}
+    # additional labels to add to the dashboards
     labels:
       grafana_dashboard: grafana_dashboard
 
