@@ -441,7 +441,7 @@ monitoring:
     # The namespace to deploy the dashboards in
     namespace: null
     # Additional annotations to add to the dashboards
-    annotations: { }
+    annotations: {}
     # additional labels to add to the dashboards
     labels:
       grafana_dashboard: grafana_dashboard
