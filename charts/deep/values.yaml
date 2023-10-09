@@ -404,3 +404,33 @@ serviceAccount:
   # -- Labels for the service account
   labels: {}
   automountServiceAccountToken: true
+
+
+## This config controls the deployment of Pod/Service Monitors to connect Deep to Prometheus for metric gathering
+monitoring:
+  # Is monitoring active, set to true to deploy the service monitor
+  enabled: false
+  # The config for the service monitor
+  serviceMonitor:
+    # the name space to deploy the service monitor in
+    namespace: null
+    # additional labels to add to the service monitor
+    labels: {}
+    # additional annotations to add to the service monitor
+    annotations: {}
+    # the name space selector to use in the service monitor
+    namespaceSelector: {}
+    # the scape timeout
+    scrapeTimeout: null
+    # the scape interval
+    interval: null
+    # -- ServiceMonitor relabel configs to apply to samples before scraping
+    # https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#relabelconfig
+    relabelings: []
+    # -- ServiceMonitor metric relabel configs to apply to samples before ingestion
+    # https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#endpoint
+    metricRelabelings: []
+    # -- ServiceMonitor will use http by default, but you can pick https as well
+    scheme: http
+    # -- ServiceMonitor will use these tlsConfig settings to make the health check requests
+    tlsConfig: null

@@ -203,3 +203,10 @@ Return the appropriate apiVersion for PodDisruptionBudget.
     {{- print "policy/v1beta1" -}}
   {{- end -}}
 {{- end -}}
+
+{{/*
+Cluster name that shows up in dashboard metrics
+*/}}
+{{- define "deep.clusterName" -}}
+{{ (include "deep.calculatedConfig" . | fromYaml).cluster_name | default .Release.Name }}
+{{- end -}}

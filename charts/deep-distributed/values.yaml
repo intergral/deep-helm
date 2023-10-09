@@ -961,11 +961,12 @@ serviceAccount:
   # -- Annotations for the service account
   annotations: {}
 
-metaMonitoring:
+## This config controls the deployment of Pod/Service Monitors to connect Deep to Prometheus for metric gathering
+monitoring:
+  # Is monitoring active, set to true to deploy the service monitor
+  enabled: false
   # ServiceMonitor configuration
   serviceMonitor:
-    # -- If enabled, ServiceMonitor resources for Prometheus Operator are created
-    enabled: false
     # -- Alternative namespace for ServiceMonitor resources
     namespace: null
     # -- Namespace selector for ServiceMonitor resources

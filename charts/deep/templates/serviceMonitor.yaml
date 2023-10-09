@@ -1,20 +1,12 @@
-{{/*
-Deep common ServiceMonitor definition
-Params:
-  ctx = . context
-  component = name of the component
-  memberlist = true/false, whether component is part of memberlist
-*/}}
-{{- define "deep.lib.serviceMonitor" -}}
-{{- if .ctx.Values.monitoring.enabled }}
-{{- with .ctx.Values.monitoring.serviceMonitor }}
+{{- if .Values.monitoring.enabled }}
+{{- with .Values.monitoring.serviceMonitor }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "deep.resourceName" $ }}
-  namespace: {{ .namespace | default $.ctx.Release.Namespace | quote }}
+  name: {{ include "deep.fullname" $ }}
+  namespace: {{ .namespace | default $.Release.Namespace | quote }}
   labels:
-    {{- include "deep.labels" $ | nindent 4 }}
+    {{- include "deep.labels" (dict "ctx" $) | nindent 4 }}
     {{- with .labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -28,18 +20,18 @@ spec:
     {{- toYaml .namespaceSelector | nindent 4 }}
   {{- else }}
     matchNames:
-      - {{ $.ctx.Release.Namespace }}
+      - {{ $.Release.Namespace }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "deep.selectorLabels" $ | nindent 6 }}
+      {{- include "deep.selectorLabels" (dict "ctx" $) | nindent 6 }}
     matchExpressions:
       - key: prometheus.io/service-monitor
         operator: NotIn
         values:
           - "false"
   endpoints:
-    - port: http-metrics
+    - port: api
       {{- with .interval }}
       interval: {{ . }}
       {{- end }}
@@ -48,10 +40,10 @@ spec:
       {{- end }}
       relabelings:
         - sourceLabels: [job]
-          replacement: "{{ $.ctx.Release.Namespace }}/{{ $.component }}"
+          replacement: "{{ include "deep.fullname" $ }}"
           targetLabel: job
         {{- if kindIs "string" .clusterLabel }}
-        - replacement: "{{ .clusterLabel | default (include "deep.clusterName" $.ctx) }}"
+        - replacement: "{{ .clusterLabel | default (include "deep.clusterName" $) }}"
           targetLabel: cluster
         {{- end }}
         {{- with .relabelings }}
@@ -68,6 +60,5 @@ spec:
       tlsConfig:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-{{- end -}}
 {{- end -}}
 {{- end -}}
