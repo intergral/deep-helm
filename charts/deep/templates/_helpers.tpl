@@ -147,3 +147,11 @@ Return if ingress supports pathType.
 {{- define "deep.ingress.supportsPathType" -}}
 {{- or (eq (include "deep.ingress.isStable" .) "true") (and (eq (include "deep.ingress.apiVersion" .) "networking.k8s.io/v1beta1") (semverCompare ">= 1.18-0" .Capabilities.KubeVersion.Version)) }}
 {{- end }}
+
+
+{{/*
+Cluster name that shows up in dashboard metrics
+*/}}
+{{- define "deep.clusterName" -}}
+{{ (include "deep.calculatedConfig" . | fromYaml).cluster_name | default .Release.Name }}
+{{- end -}}
