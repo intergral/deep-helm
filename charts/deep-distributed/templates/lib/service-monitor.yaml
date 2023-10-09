@@ -51,7 +51,7 @@ spec:
           replacement: "{{ $.ctx.Release.Namespace }}/{{ $.component }}"
           targetLabel: job
         {{- if kindIs "string" .clusterLabel }}
-        - replacement: "{{ .clusterLabel | default (include "deep.clusterName" $.ctx) }}"
+        - replacement: "{{ include "deep.clusterName" $.ctx}}"
           targetLabel: cluster
         {{- end }}
         {{- with .relabelings }}

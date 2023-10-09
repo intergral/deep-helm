@@ -868,6 +868,9 @@ config:
   # consumed.
   useExternalConfig: false
 
+  # The name of the cluster, can be used to identify the cluster if running more than one
+  clusterName: null
+
   # -- Defines what kind of object stores the configuration, a ConfigMap or a Secret.
   # In order to move sensitive information (such as credentials) from the ConfigMap/Secret to a more secure location (e.g. vault), it is possible to use [environment variables in the configuration](https://grafana.com/docs/mimir/latest/operators-guide/configuring/reference-configuration-parameters/#use-environment-variables-in-the-configuration).
   # Such environment variables can be then stored in a separate Secret and injected via the global.extraEnvFrom value. For details about environment injection from a Secret please see [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/#use-case-as-container-environment-variables).
@@ -967,6 +970,8 @@ monitoring:
   enabled: false
   # ServiceMonitor configuration
   serviceMonitor:
+    # the label to use to identify this cluster
+    clusterLabel: "cluster"
     # -- Alternative namespace for ServiceMonitor resources
     namespace: null
     # -- Namespace selector for ServiceMonitor resources
@@ -989,6 +994,14 @@ monitoring:
     scheme: http
     # -- ServiceMonitor will use these tlsConfig settings to make the health check requests
     tlsConfig: null
+  # This controls the config for provided dashboards
+  dashboards:
+    # if enabled the dashboards will be provided
+    enabled: false
+    namespace: null
+    annotations: {}
+    labels:
+      grafana_dashboard: grafana_dashboard
 
 # Configuration for the gateway
 gateway:

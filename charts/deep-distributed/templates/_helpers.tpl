@@ -208,5 +208,5 @@ Return the appropriate apiVersion for PodDisruptionBudget.
 Cluster name that shows up in dashboard metrics
 */}}
 {{- define "deep.clusterName" -}}
-{{ (include "deep.calculatedConfig" . | fromYaml).cluster_name | default .Release.Name }}
+{{ .Values.config.clusterName | default .Release.Name }}
 {{- end -}}
