@@ -320,6 +320,9 @@ config:
   # consumed.
   useExternalConfig: false
 
+  # The name of the cluster, can be used to identify the cluster if running more than one
+  clusterName: null
+
   # -- Defines what kind of object stores the configuration, a ConfigMap or a Secret.
   # In order to move sensitive information (such as credentials) from the ConfigMap/Secret to a more secure location (e.g. vault), it is possible to use [environment variables in the configuration](https://grafana.com/docs/mimir/latest/operators-guide/configuring/reference-configuration-parameters/#use-environment-variables-in-the-configuration).
   # Such environment variables can be then stored in a separate Secret and injected via the global.extraEnvFrom value. For details about environment injection from a Secret please see [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/#use-case-as-container-environment-variables).
@@ -412,6 +415,8 @@ monitoring:
   enabled: false
   # The config for the service monitor
   serviceMonitor:
+    # the label to use to identify this cluster
+    clusterLabel: "cluster"
     # the name space to deploy the service monitor in
     namespace: null
     # additional labels to add to the service monitor

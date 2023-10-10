@@ -43,7 +43,7 @@ spec:
           replacement: "{{ include "deep.fullname" $ }}"
           targetLabel: job
         {{- if kindIs "string" .clusterLabel }}
-        - replacement: "{{ .clusterLabel | default (include "deep.clusterName" $) }}"
+        - replacement: "{{ include "deep.clusterName" $.ctx}}"
           targetLabel: cluster
         {{- end }}
         {{- with .relabelings }}
