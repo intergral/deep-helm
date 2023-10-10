@@ -52,7 +52,7 @@ spec:
           targetLabel: job
         {{- if kindIs "string" .clusterLabel }}
         - replacement: "{{ include "deep.clusterName" $.ctx}}"
-          targetLabel: cluster
+          targetLabel: "{{ .clusterLabel }}"
         {{- end }}
         {{- with .relabelings }}
         {{- toYaml . | nindent 8 }}

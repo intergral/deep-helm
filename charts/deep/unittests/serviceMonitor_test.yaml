@@ -1,0 +1,46 @@
+suite: test service monitor
+chart:
+  version: 9.9.9+test
+  appVersion: 1.1.1+test
+release:
+  name: deep
+set:
+  monitoring:
+    enabled: true
+    serviceMonitor:
+      namespace: monitoring
+      labels:
+        release: prometheus
+tests:
+  - it: should create correct servicemonitor
+    template: serviceMonitor.yaml
+    asserts:
+      - isKind:
+          of: ServiceMonitor
+      - matchRegex:
+          path: metadata.name
+          pattern: deep
+  - it: should have cluster label
+    template: serviceMonitor.yaml
+    asserts:
+      - equal:
+          path: spec.endpoints[0].relabelings[1].replacement
+          value: deep
+      - equal:
+          path: spec.endpoints[0].relabelings[1].targetLabel
+          value: cluster
+  - it: cluster label should use config
+    set:
+      config:
+        clusterName: "fromconfig"
+      monitoring:
+        serviceMonitor:
+          clusterLabel: "labelfromconfig"
+    template: serviceMonitor.yaml
+    asserts:
+      - equal:
+          path: spec.endpoints[0].relabelings[1].replacement
+          value: fromconfig
+      - equal:
+          path: spec.endpoints[0].relabelings[1].targetLabel
+          value: labelfromconfig
