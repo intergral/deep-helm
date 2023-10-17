@@ -1,0 +1,13 @@
+suite: tracepoint-api deployment
+chart:
+  version: 9.9.9+test
+  appVersion: 1.1.1+test
+release:
+  name: deep
+tests:
+  - it: should create correct servicemonitor
+    template: tracepoint-api/deployment-tracepoint-api.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].name
+          value: tracepoint-api

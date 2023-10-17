@@ -64,11 +64,11 @@ spec:
           imagePullPolicy: {{ .Values.global.image.pullPolicy }}
           name: distributor
           ports:
+            - containerPort: 3100
+              name: http-metrics
             - containerPort: 7946
               name: http-memberlist
               protocol: TCP
-            - containerPort: 3100
-              name: http-metrics
             {{- if .Values.distributor.config.receivers.deep.enabled }}
             - containerPort: 43315
               name: deep

@@ -66,13 +66,13 @@ spec:
             {{- end }}
           image: {{ include "deep.imageReference" $dict }}
           imagePullPolicy: {{ .Values.global.image.pullPolicy }}
-          name: tracepoint
+          name: tracepoint-api
           ports:
+            - containerPort: 3100
+              name: http-metrics
             - containerPort: 7946
               name: http-memberlist
               protocol: TCP
-            - containerPort: 3100
-              name: http-metrics
           {{- with .Values.tracepointApi.extraEnv }}
           env:
             {{- toYaml . | nindent 12 }}
