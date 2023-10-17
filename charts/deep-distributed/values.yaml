@@ -1013,7 +1013,7 @@ monitoring:
     labels:
       release: prometheus
     # Additional annotations to add to the rules
-    annotations: { }
+    annotations: {}
     # The namespace to deploy the rules in
     namespace: null
     # The rules to add
