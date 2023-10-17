@@ -90,3 +90,4 @@ _site
 docs_out
 
 charts/**/unittests/__snapshot__/
+charts/**/unittests/**/__snapshot__/

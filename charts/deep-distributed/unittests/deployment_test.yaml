@@ -1,0 +1,20 @@
+suite: common deployment
+chart:
+  version: 9.9.9+test
+  appVersion: 1.1.1+test
+tests:
+  - it: should have metrics port
+    templates:
+      - compactor/deployment-compactor.yaml
+      - distributor/deployment-distributor.yaml
+      - ingester/statefulset-ingester.yaml
+      - query-frontend/deployment-query-frontend.yaml
+      - tracepoint/deployment-tracepoint.yaml
+      - tracepoint-api/deployment-tracepoint-api.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].name
+          value: http-metrics
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 3100

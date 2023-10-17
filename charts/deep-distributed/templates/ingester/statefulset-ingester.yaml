@@ -67,12 +67,12 @@ spec:
           imagePullPolicy: {{ .Values.global.image.pullPolicy }}
           name: ingester
           ports:
+            - name: http-metrics
+              containerPort: 3100
             - name: grpc
               containerPort: 9095
             - name: http-memberlist
               containerPort: 7946
-            - name: http-metrics
-              containerPort: 3100
           {{- with .Values.ingester.extraEnv }}
           env:
             {{- toYaml . | nindent 12 }}

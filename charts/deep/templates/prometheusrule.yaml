@@ -1,0 +1,23 @@
+{{- if .Values.monitoring.rules.enabled -}}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "deep.fullname" $ }}-rules
+  namespace: {{ default $.Release.Namespace $.Values.monitoring.rules.namespace }}
+  {{- with $.Values.monitoring.rules.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 -}}
+  {{- end }}
+  labels:
+      {{- include "deep.labels" (dict "ctx" $) | nindent 4 }}
+      {{- with $.Values.monitoring.rules.labels }}
+      {{- toYaml . | nindent 4 }}
+      {{- end}}
+spec:
+  groups:
+    - name: deep.rules
+      rules:
+        {{- with .Values.monitoring.rules.rules }}
+        {{- tpl . $ | nindent 8 -}}
+        {{- end}}
+{{- end -}}

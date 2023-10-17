@@ -1005,6 +1005,23 @@ monitoring:
     # additional labels to add to the dashboards
     labels:
       grafana_dashboard: "1"
+  # This controls the prometheus rules
+  rules:
+    # if enabled the prometheus rules will be deployed
+    enabled: false
+    # additional labels to add to the rules
+    labels:
+      release: prometheus
+    # Additional annotations to add to the rules
+    annotations: {}
+    # The namespace to deploy the rules in
+    namespace: null
+    # The rules to add
+    rules: |
+      - alert: Unhealthy Ring Member
+        expr: |
+          deep_ring_members{state="Unhealthy"} > 0
+
 
 # Configuration for the gateway
 gateway:
