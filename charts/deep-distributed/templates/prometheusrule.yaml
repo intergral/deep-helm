@@ -18,6 +18,6 @@ spec:
     - name: deep.rules
       rules:
         {{- with .Values.monitoring.rules.rules }}
-        {{- tpl . $ | nindent 8 -}}
+        {{- toYaml . | nindent 8 -}}
         {{- end}}
 {{- end -}}

@@ -462,7 +462,13 @@ monitoring:
     # The namespace to deploy the rules in
     namespace: null
     # The rules to add
-    rules: |
+    rules:
       - alert: Unhealthy Ring Member
         expr: |
           deep_ring_members{state="Unhealthy"} > 0
+        labels:
+          severity: critical 
+        annotations:
+          description: "{{ $labels.service }} has {{ $value }} unhealthy nodes in ring {{ $labels.name }}."
+          runbook_url: https://intergral.github.io/deep/runbooks/unhealthy_ring_node/
+          summary: One or more ring members are unhealthy
