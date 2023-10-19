@@ -1019,14 +1019,53 @@ monitoring:
     # The rules to add
     rules:
       - alert: Unhealthy Ring Member
-        expr: |
-          deep_ring_members{state="Unhealthy"} > 0
+        expr: deep_ring_members{state="Unhealthy"} > 0
         labels:
           severity: critical
         annotations:
           description: "{{ $labels.service }} has {{ $value }} unhealthy nodes in ring {{ $labels.name }}."
           runbook_url: https://intergral.github.io/deep/runbooks/unhealthy_ring_node/
           summary: One or more ring members are unhealthy
+      - alert: Required Ring Member Missing
+        expr: deep_ring_members{state="ACTIVE", name=~"ingester|tracepoint"} == 0
+        labels:
+          severity: critical
+        annotations:
+          description: "{{ $labels.service }} has {{ $value }} active nodes in ring {{ $labels.name }}."
+          runbook_url: https://intergral.github.io/deep/runbooks/missing_ring_node/
+          summary: One or more ring has missing required nodes
+      - alert: Tracepoint ring missing member
+        expr: deep_ring_members{state="ACTIVE", name="tracepoint"} != {{ .Values.tracepoint.replicas }}
+        labels:
+          severity: critical
+        annotations:
+          description: "{{ $labels.service }} has {{ $value }} active nodes in ring {{ $labels.name }}."
+          runbook_url: https://intergral.github.io/deep/runbooks/missing_ring_node/
+          summary: One or more ring has missing required nodes
+      - alert: Ingester ring missing member
+        expr: deep_ring_members{state="ACTIVE", name="ingester"} != {{ .Values.ingester.replicas }}
+        labels:
+          severity: critical
+        annotations:
+          description: "{{ $labels.service }} has {{ $value }} active nodes in ring {{ $labels.name }}."
+          runbook_url: https://intergral.github.io/deep/runbooks/missing_ring_node/
+          summary: One or more ring has missing required nodes
+      - alert: Compactor ring missing member
+        expr: deep_ring_members{state="ACTIVE", name="compactor"} != {{ .Values.compactor.replicas }}
+        labels:
+          severity: critical
+        annotations:
+          description: "{{ $labels.service }} has {{ $value }} active nodes in ring {{ $labels.name }}."
+          runbook_url: https://intergral.github.io/deep/runbooks/missing_ring_node/
+          summary: One or more ring has missing required nodes
+      - alert: Metrics Generator ring missing member
+        expr: deep_ring_members{state="ACTIVE", name="metrics-generator"} != {{ if .Values.metricsGenerator.enabled }} {{.Values.distributor.replicas }} {{else}}0{{end}}
+        labels:
+          severity: critical
+        annotations:
+          description: "{{ $labels.service }} has {{ $value }} active nodes in ring {{ $labels.name }}."
+          runbook_url: https://intergral.github.io/deep/runbooks/missing_ring_node/
+          summary: One or more ring has missing required nodes
 
 
 # Configuration for the gateway

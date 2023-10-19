@@ -17,7 +17,17 @@ spec:
   groups:
     - name: deep.rules
       rules:
-        {{- with .Values.monitoring.rules.rules }}
-        {{- toYaml . | nindent 8 -}}
-        {{- end}}
+        {{ range .Values.monitoring.rules.rules }}
+        - alert: {{ .alert }}
+          expr: |
+            {{- tpl .expr $ | nindent 12}}
+          {{- with .labels}}
+          labels:
+            {{- toYaml . | nindent 12}}
+          {{- end }}
+          {{- with .annotations }}
+          annotations:
+            {{- toYaml . | nindent 12}}
+          {{- end}}
+        {{ end}}
 {{- end -}}
