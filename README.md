@@ -1,3 +1,6 @@
+![Deep Release](https://img.shields.io/github/v/release/intergral/deep-helm?filter=deep-1*)
+![Deep Distributed](https://img.shields.io/github/v/release/intergral/deep-helm?filter=deep-d*)
+
 # Deep Kubernetes Helm Charts
 
 This project contains a collection of helm charts related to the running of Deep on a kubernetes cluster.
