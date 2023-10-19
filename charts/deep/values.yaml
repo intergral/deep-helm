@@ -480,7 +480,7 @@ monitoring:
           runbook_url: https://intergral.github.io/deep/runbooks/missing_ring_node/
           summary: One or more ring has missing required nodes
       - alert: Tracepoint ring missing member
-        expr: deep_ring_members{state="ACTIVE", name="tracepoint"} != {{ .Values.tracepoint.replicas }}
+        expr: deep_ring_members{state="ACTIVE", name="tracepoint"} != {{ .Values.deep.replicas }}
         labels:
           severity: critical
         annotations:
@@ -488,7 +488,7 @@ monitoring:
           runbook_url: https://intergral.github.io/deep/runbooks/missing_ring_node/
           summary: One or more ring has missing required nodes
       - alert: Ingester ring missing member
-        expr: deep_ring_members{state="ACTIVE", name="ingester"} != {{ .Values.ingester.replicas }}
+        expr: deep_ring_members{state="ACTIVE", name="ingester"} != {{ .Values.deep.replicas }}
         labels:
           severity: critical
         annotations:
@@ -496,7 +496,7 @@ monitoring:
           runbook_url: https://intergral.github.io/deep/runbooks/missing_ring_node/
           summary: One or more ring has missing required nodes
       - alert: Compactor ring missing member
-        expr: deep_ring_members{state="ACTIVE", name="compactor"} != {{ .Values.compactor.replicas }}
+        expr: deep_ring_members{state="ACTIVE", name="compactor"} != {{ .Values.deep.replicas }}
         labels:
           severity: critical
         annotations:
@@ -504,7 +504,7 @@ monitoring:
           runbook_url: https://intergral.github.io/deep/runbooks/missing_ring_node/
           summary: One or more ring has missing required nodes
       - alert: Metrics Generator ring missing member
-        expr: deep_ring_members{state="ACTIVE", name="metrics-generator"} != {{ if .Values.metricsGenerator.enabled }} {{.Values.distributor.replicas }} {{else}}0{{end}}
+        expr: deep_ring_members{state="ACTIVE", name="metrics-generator"} != {{ if .Values.metricsGenerator.enabled }} {{.Values.deep.replicas }} {{else}}0{{end}}
         labels:
           severity: critical
         annotations:
