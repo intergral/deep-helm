@@ -454,13 +454,18 @@ monitoring:
   rules:
     # if enabled the prometheus rules will be deployed
     enabled: false
-    # additional labels to add to the rules
+    # additional labels to add to the PrometheusRule
     labels:
       release: prometheus
-    # Additional annotations to add to the rules
+    # Additional annotations to add to the PrometheusRule
     annotations: {}
     # The namespace to deploy the rules in
     namespace: null
+    # Additional labels to add to the alerts
+    alertLabels:
+      app_name: '{{ include "deep.fullname" . }}'
+    # Additional annotations to add to the alerts
+    alertAnnotations: {}
     # The rules to add
     rules:
       - alert: Unhealthy Ring Member
