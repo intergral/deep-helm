@@ -21,13 +21,21 @@ spec:
         - alert: {{ .alert }}
           expr: |
             {{- tpl .expr $ | nindent 12}}
-          {{- with .labels}}
           labels:
-            {{- toYaml . | nindent 12}}
-          {{- end }}
-          {{- with .annotations }}
+            {{- range $key, $value := $.Values.monitoring.rules.alertLabels }}
+            {{ $key }}: {{ tpl $value $ }}
+            {{- end }}
+            {{- with .labels}}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           annotations:
+            app_version: {{ $.Chart.AppVersion }}
+            chart_version: {{ $.Chart.Version }}
+            {{- with .annotations }}
             {{- toYaml . | nindent 12}}
-          {{- end}}
+            {{- end}}
+            {{- with $.Values.monitoring.rules.alertAnnotations }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
         {{ end}}
 {{- end -}}
