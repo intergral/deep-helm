@@ -253,7 +253,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "sum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=~\"($namespace)/cortex-gw(-internal)?\", route=~\"opentelemetry_proto_collector_trace_v1_traceservice_export\",status_code=~\"2.+\"}[$__rate_interval])) /\nsum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=~\"($namespace)/cortex-gw(-internal)?\", route=~\"opentelemetry_proto_collector_trace_v1_traceservice_export\"}[$__rate_interval]))\n",
+          "expr": "sum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=\"deep\", route=~\"opentelemetry_proto_collector_trace_v1_traceservice_export\",status_code=~\"2.+\"}[$__rate_interval])) /\nsum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=\"deep\", route=~\"opentelemetry_proto_collector_trace_v1_traceservice_export\"}[$__rate_interval]))\n",
           "instant": false,
           "interval": "",
           "legendFormat": "",
@@ -378,7 +378,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "sum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=~\"($namespace)/cortex-gw(-internal)?\", route=~\"opentelemetry_proto_collector_trace_v1_traceservice_export\",status_code=~\"4.+\"}[$__rate_interval])) /\nsum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=~\"($namespace)/cortex-gw(-internal)?\", route=~\"opentelemetry_proto_collector_trace_v1_traceservice_export\"}[$__rate_interval]))\n",
+          "expr": "sum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=\"deep\", route=~\"opentelemetry_proto_collector_trace_v1_traceservice_export\",status_code=~\"4.+\"}[$__rate_interval])) /\nsum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=\"deep\", route=~\"opentelemetry_proto_collector_trace_v1_traceservice_export\"}[$__rate_interval]))\n",
           "instant": false,
           "interval": "",
           "legendFormat": "",
@@ -499,7 +499,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "sum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=~\"($namespace)/cortex-gw(-internal)?\", route=~\"opentelemetry_proto_collector_trace_v1_traceservice_export\",status_code=~\"5.+\"}[$__rate_interval])) /\nsum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=~\"($namespace)/cortex-gw(-internal)?\", route=~\"opentelemetry_proto_collector_trace_v1_traceservice_export\"}[$__rate_interval]))\n",
+          "expr": "sum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=\"deep\", route=~\"opentelemetry_proto_collector_trace_v1_traceservice_export\",status_code=~\"5.+\"}[$__rate_interval])) /\nsum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=\"deep\", route=~\"opentelemetry_proto_collector_trace_v1_traceservice_export\"}[$__rate_interval]))\n",
           "instant": false,
           "interval": "",
           "legendFormat": "",
@@ -622,7 +622,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by (le) (deep_request_duration_seconds_bucket{cluster=~\"$cluster\", job=~\"($namespace)/.*\", route=~\"opentelemetry_proto_collector_trace_v1_traceservice_export\"}))\n",
+          "expr": "histogram_quantile(0.99, sum by (le) (deep_request_duration_seconds_bucket{cluster=~\"$cluster\", job=\"deep\", route=~\"opentelemetry_proto_collector_trace_v1_traceservice_export\"}))\n",
           "instant": false,
           "interval": "",
           "legendFormat": "",
@@ -739,7 +739,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "sum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=~\"($namespace)/.*\", route=~\"deep_api_.*\",status_code=~\"2.+\"}[$__rate_interval])) /\nsum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=~\"($namespace)/.*\", route=~\"deep_api_.*\"}[$__rate_interval]))\n",
+          "expr": "sum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=\"deep\", route=~\"deep_api_.*\",status_code=~\"2.+\"}[$__rate_interval])) /\nsum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=\"deep\", route=~\"deep_api_.*\"}[$__rate_interval]))\n",
           "instant": false,
           "interval": "",
           "legendFormat": "",
@@ -864,7 +864,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "sum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=~\"($namespace)/.*\", route=~\"deep_api_.*\",status_code=~\"4.+\"}[$__rate_interval])) /\nsum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=~\"($namespace)/.*\", route=~\"deep_api_.*\"}[$__rate_interval]))\n",
+          "expr": "sum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=\"deep\", route=~\"deep_api_.*\",status_code=~\"4.+\"}[$__rate_interval])) /\nsum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=\"deep\", route=~\"deep_api_.*\"}[$__rate_interval]))\n",
           "instant": false,
           "interval": "",
           "legendFormat": "",
@@ -985,7 +985,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "sum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=~\"($namespace)/.*\", route=~\"deep_api_.*\",status_code=~\"5.+\"}[$__rate_interval])) /\nsum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=~\"($namespace)/.*\", route=~\"deep_api_.*\"}[$__rate_interval]))\n",
+          "expr": "sum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=\"deep\", route=~\"deep_api_.*\",status_code=~\"5.+\"}[$__rate_interval])) /\nsum(rate(deep_request_duration_seconds_count{cluster=~\"$cluster\", job=\"deep\", route=~\"deep_api_.*\"}[$__rate_interval]))\n",
           "instant": false,
           "interval": "",
           "legendFormat": "",
@@ -1108,7 +1108,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by (le) (deep_request_duration_seconds_bucket{cluster=~\"$cluster\", job=~\"($namespace)/.*\", route=~\"deep_api_.*\"}))",
+          "expr": "histogram_quantile(0.99, sum by (le) (deep_request_duration_seconds_bucket{cluster=~\"$cluster\", job=\"deep\", route=~\"deep_api_.*\"}))",
           "instant": false,
           "interval": "",
           "legendFormat": "",
@@ -1475,7 +1475,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "1 - (\n  avg_over_time(histogram_quantile(0.99, sum by (le) (deep_request_duration_seconds_bucket{cluster=~\"$cluster\", job=~\"($namespace)/.*\", route=~\"opentelemetry_proto_collector_trace_v1_traceservice_export\"} offset 24h))[1h:])\n  /\n  avg_over_time(histogram_quantile(0.99, sum by (le) (deep_request_duration_seconds_bucket{cluster=~\"$cluster\", job=~\"($namespace)/.*\", route=~\"opentelemetry_proto_collector_trace_v1_traceservice_export\"}))[1h:])\n)\n",
+          "expr": "1 - (\n  avg_over_time(histogram_quantile(0.99, sum by (le) (deep_request_duration_seconds_bucket{cluster=~\"$cluster\", job=\"deep\", route=~\"opentelemetry_proto_collector_trace_v1_traceservice_export\"} offset 24h))[1h:])\n  /\n  avg_over_time(histogram_quantile(0.99, sum by (le) (deep_request_duration_seconds_bucket{cluster=~\"$cluster\", job=\"deep\", route=~\"opentelemetry_proto_collector_trace_v1_traceservice_export\"}))[1h:])\n)\n",
           "format": "time_series",
           "interval": "1m",
           "intervalFactor": 2,
@@ -1489,7 +1489,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "1 - (\n  avg_over_time(histogram_quantile(0.99, sum by (le) (deep_request_duration_seconds_bucket{cluster=~\"$cluster\", job=~\"($namespace)/cortex-gw(-internal)?\", route=~\"deep_api_.*\"} offset 24h))[1h:])\n  /\n  avg_over_time(histogram_quantile(0.99, sum by (le) (deep_request_duration_seconds_bucket{cluster=~\"$cluster\", job=~\"($namespace)/cortex-gw(-internal)?\", route=~\"deep_api_.*\"}))[1h:])\n)\n",
+          "expr": "1 - (\n  avg_over_time(histogram_quantile(0.99, sum by (le) (deep_request_duration_seconds_bucket{cluster=~\"$cluster\", job=\"deep\", route=~\"deep_api_.*\"} offset 24h))[1h:])\n  /\n  avg_over_time(histogram_quantile(0.99, sum by (le) (deep_request_duration_seconds_bucket{cluster=~\"$cluster\", job=\"deep\", route=~\"deep_api_.*\"}))[1h:])\n)\n",
           "format": "time_series",
           "interval": "1m",
           "intervalFactor": 2,
