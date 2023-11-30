@@ -143,7 +143,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "max(\n  max by (cluster, namespace, limit_name) (deep_limits_overrides{cluster=~\"$cluster\", job=~\"($namespace)/compactor\",user=\"$tenant\"})\n  or max by (cluster, namespace, limit_name) (deep_limits_defaults{cluster=~\"$cluster\", job=~\"($namespace)/compactor\"})\n) by (limit_name)\n",
+          "expr": "max(\n  max by (cluster, namespace, limit_name) (deep_limits_overrides{cluster=~\"$cluster\", job=\"deep\",user=\"$tenant\"})\n  or max by (cluster, namespace, limit_name) (deep_limits_defaults{cluster=~\"$cluster\", job=\"deep\"})\n) by (limit_name)\n",
           "format": "table",
           "instant": true,
           "intervalFactor": 2,
@@ -320,7 +320,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "sum(rate(deep_distributor_snapshot_bytes_received_total{cluster=~\"$cluster\", job=~\"($namespace)/distributor\",tenant=\"$tenant\"}[$__rate_interval]))",
+          "expr": "sum(rate(deep_distributor_snapshot_bytes_received_total{cluster=~\"$cluster\", job=\"deep\",tenant=\"$tenant\"}[$__rate_interval]))",
           "format": "time_series",
           "interval": "1m",
           "intervalFactor": 2,
@@ -334,7 +334,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "max(\n  max by (cluster, namespace, limit_name) (deep_limits_overrides{cluster=~\"$cluster\", job=~\"($namespace)/compactor\",user=\"$tenant\",limit_name=\"ingestion_rate_limit_bytes\"})\n  or max by (cluster, namespace, limit_name) (deep_limits_defaults{cluster=~\"$cluster\", job=~\"($namespace)/compactor\",limit_name=\"ingestion_rate_limit_bytes\"})\n) by (ingestion_rate_limit_bytes)\n",
+          "expr": "max(\n  max by (cluster, namespace, limit_name) (deep_limits_overrides{cluster=~\"$cluster\", job=\"deep\",user=\"$tenant\",limit_name=\"ingestion_rate_limit_bytes\"})\n  or max by (cluster, namespace, limit_name) (deep_limits_defaults{cluster=~\"$cluster\", job=\"deep\",limit_name=\"ingestion_rate_limit_bytes\"})\n) by (ingestion_rate_limit_bytes)\n",
           "format": "time_series",
           "interval": "1m",
           "intervalFactor": 2,
@@ -348,7 +348,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "max(\n  max by (cluster, namespace, limit_name) (deep_limits_overrides{cluster=~\"$cluster\", job=~\"($namespace)/compactor\",user=\"$tenant\",limit_name=\"ingestion_burst_size_bytes\"})\n  or max by (cluster, namespace, limit_name) (deep_limits_defaults{cluster=~\"$cluster\", job=~\"($namespace)/compactor\",limit_name=\"ingestion_burst_size_bytes\"})\n) by (ingestion_burst_size_bytes)\n",
+          "expr": "max(\n  max by (cluster, namespace, limit_name) (deep_limits_overrides{cluster=~\"$cluster\", job=\"deep\",user=\"$tenant\",limit_name=\"ingestion_burst_size_bytes\"})\n  or max by (cluster, namespace, limit_name) (deep_limits_defaults{cluster=~\"$cluster\", job=\"deep\",limit_name=\"ingestion_burst_size_bytes\"})\n) by (ingestion_burst_size_bytes)\n",
           "format": "time_series",
           "interval": "1m",
           "intervalFactor": 2,
@@ -447,7 +447,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "sum(rate(deep_distributor_snapshots_requests{cluster=~\"$cluster\", job=~\"($namespace)/distributor\",tenant=\"$tenant\"}[$__rate_interval]))",
+          "expr": "sum(rate(deep_distributor_snapshots_requests{cluster=~\"$cluster\", job=\"deep\",tenant=\"$tenant\"}[$__rate_interval]))",
           "format": "time_series",
           "interval": "1m",
           "intervalFactor": 2,
@@ -461,7 +461,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "sum(rate(deep_discarded_snapshots_total{cluster=~\"$cluster\", job=~\"($namespace)/distributor\",tenant=\"$tenant\"}[$__rate_interval])) by (reason)",
+          "expr": "sum(rate(deep_discarded_snapshots_total{cluster=~\"$cluster\", job=\"deep\",tenant=\"$tenant\"}[$__rate_interval])) by (reason)",
           "format": "time_series",
           "interval": "1m",
           "intervalFactor": 2,
@@ -605,7 +605,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "max(deep_ingester_live_snapshots{cluster=~\"$cluster\", job=~\"($namespace)/ingester\",tenant=\"$tenant\"})",
+          "expr": "max(deep_ingester_live_snapshots{cluster=~\"$cluster\", job=\"deep\",tenant=\"$tenant\"})",
           "format": "time_series",
           "interval": "1m",
           "intervalFactor": 2,
@@ -619,7 +619,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "max(\n  max by (cluster, namespace, limit_name) (deep_limits_overrides{cluster=~\"$cluster\", job=~\"($namespace)/compactor\",user=\"$tenant\",limit_name=\"max_global_traces_per_user\"})\n  or max by (cluster, namespace, limit_name) (deep_limits_defaults{cluster=~\"$cluster\", job=~\"($namespace)/compactor\",limit_name=\"max_global_traces_per_user\"})\n) by (max_global_traces_per_user)\n",
+          "expr": "max(\n  max by (cluster, namespace, limit_name) (deep_limits_overrides{cluster=~\"$cluster\", job=\"deep\",user=\"$tenant\",limit_name=\"max_global_traces_per_user\"})\n  or max by (cluster, namespace, limit_name) (deep_limits_defaults{cluster=~\"$cluster\", job=\"deep\",limit_name=\"max_global_traces_per_user\"})\n) by (max_global_traces_per_user)\n",
           "format": "time_series",
           "interval": "1m",
           "intervalFactor": 2,
@@ -633,7 +633,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "max(\n  max by (cluster, namespace, limit_name) (deep_limits_overrides{cluster=~\"$cluster\", job=~\"($namespace)/compactor\",user=\"$tenant\",limit_name=\"max_local_traces_per_user\"})\n  or max by (cluster, namespace, limit_name) (deep_limits_defaults{cluster=~\"$cluster\", job=~\"($namespace)/compactor\",limit_name=\"max_local_traces_per_user\"})\n) by (max_local_traces_per_user)\n",
+          "expr": "max(\n  max by (cluster, namespace, limit_name) (deep_limits_overrides{cluster=~\"$cluster\", job=\"deep\",user=\"$tenant\",limit_name=\"max_local_traces_per_user\"})\n  or max by (cluster, namespace, limit_name) (deep_limits_defaults{cluster=~\"$cluster\", job=\"deep\",limit_name=\"max_local_traces_per_user\"})\n) by (max_local_traces_per_user)\n",
           "format": "time_series",
           "interval": "1m",
           "intervalFactor": 2,
@@ -758,7 +758,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "sum(rate(deep_query_frontend_queries_total{cluster=~\"$cluster\", job=~\"($namespace)/query-frontend\",tenant=\"$tenant\",op=\"snapshots\"}[$__rate_interval])) by (status)",
+          "expr": "sum(rate(deep_query_frontend_queries_total{cluster=~\"$cluster\", job=\"deep\",tenant=\"$tenant\",op=\"snapshots\"}[$__rate_interval])) by (status)",
           "format": "time_series",
           "interval": "1m",
           "intervalFactor": 2,
@@ -857,7 +857,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "sum(rate(deep_query_frontend_queries_total{cluster=~\"$cluster\", job=~\"($namespace)/query-frontend\",tenant=\"$tenant\",op=\"search\"}[$__rate_interval])) by (status)",
+          "expr": "sum(rate(deep_query_frontend_queries_total{cluster=~\"$cluster\", job=\"deep\",tenant=\"$tenant\",op=\"search\"}[$__rate_interval])) by (status)",
           "format": "time_series",
           "interval": "1m",
           "intervalFactor": 2,
@@ -982,7 +982,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "avg(deep_db_blocklist_length{cluster=~\"$cluster\", job=~\"($namespace)/compactor\",tenant=\"$tenant\"})",
+          "expr": "avg(deep_db_blocklist_length{cluster=~\"$cluster\", job=\"deep\",tenant=\"$tenant\"})",
           "format": "time_series",
           "interval": "1m",
           "intervalFactor": 2,
@@ -1081,7 +1081,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "sum(deep_db_compaction_outstanding_blocks{cluster=~\"$cluster\", job=~\"($namespace)/compactor\",tenant=\"$tenant\"})\n/\ncount(deep_build_info{cluster=~\"$cluster\", job=~\"($namespace)/compactor\"})\n",
+          "expr": "sum(deep_db_compaction_outstanding_blocks{cluster=~\"$cluster\", job=\"deep\",tenant=\"$tenant\"})\n/\ncount(deep_build_info{cluster=~\"$cluster\", job=\"deep\"})\n",
           "format": "time_series",
           "interval": "1m",
           "intervalFactor": 2,
@@ -1206,7 +1206,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "sum(rate(deep_metrics_generator_bytes_received_total{cluster=~\"$cluster\", job=~\"($namespace)/metrics-generator\",tenant=\"$tenant\"}[$__rate_interval]))",
+          "expr": "sum(rate(deep_metrics_generator_bytes_received_total{cluster=~\"$cluster\", job=\"deep\",tenant=\"$tenant\"}[$__rate_interval]))",
           "format": "time_series",
           "interval": "1m",
           "intervalFactor": 2,
@@ -1328,7 +1328,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "sum(deep_metrics_generator_registry_active_series{cluster=~\"$cluster\", job=~\"($namespace)/metrics-generator\",tenant=\"$tenant\"})",
+          "expr": "sum(deep_metrics_generator_registry_active_series{cluster=~\"$cluster\", job=\"deep\",tenant=\"$tenant\"})",
           "format": "time_series",
           "interval": "1m",
           "intervalFactor": 2,
@@ -1342,7 +1342,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "max(\n  max by (cluster, namespace, limit_name) (deep_limits_overrides{cluster=~\"$cluster\", job=~\"($namespace)/compactor\",user=\"$tenant\",limit_name=\"metrics_generator_max_active_series\"})\n  or max by (cluster, namespace, limit_name) (deep_limits_defaults{cluster=~\"$cluster\", job=~\"($namespace)/compactor\",limit_name=\"metrics_generator_max_active_series\"})\n) by (metrics_generator_max_active_series)\n",
+          "expr": "max(\n  max by (cluster, namespace, limit_name) (deep_limits_overrides{cluster=~\"$cluster\", job=\"deep\",user=\"$tenant\",limit_name=\"metrics_generator_max_active_series\"})\n  or max by (cluster, namespace, limit_name) (deep_limits_defaults{cluster=~\"$cluster\", job=\"deep\",limit_name=\"metrics_generator_max_active_series\"})\n) by (metrics_generator_max_active_series)\n",
           "format": "time_series",
           "interval": "1m",
           "intervalFactor": 2,
@@ -1462,7 +1462,7 @@
           "type": "intergral-deep-datasource",
           "uid": "$datasource"
         },
-        "definition": "label_values(deep_db_blocklist_length{cluster=\"$cluster\", job=~\"($namespace)/compactor\"},tenant)",
+        "definition": "label_values(deep_db_blocklist_length{cluster=\"$cluster\", job=\"deep\"},tenant)",
         "hide": 0,
         "includeAll": false,
         "label": "tenant",
@@ -1471,7 +1471,7 @@
         "options": [],
         "query": {
           "labelFilters": [],
-          "query": "label_values(deep_db_blocklist_length{cluster=\"$cluster\", job=~\"($namespace)/compactor\"},tenant)",
+          "query": "label_values(deep_db_blocklist_length{cluster=\"$cluster\", job=\"deep\"},tenant)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
