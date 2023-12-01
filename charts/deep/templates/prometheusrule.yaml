@@ -28,6 +28,9 @@ spec:
             {{- with .labels}}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+          {{- if .for }}
+          for: {{ .for }}
+          {{- end}}
           annotations:
             app_version: {{ $.Chart.AppVersion }}
             chart_version: {{ $.Chart.Version }}
