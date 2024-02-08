@@ -74,10 +74,8 @@ spec:
           name: deep-conf
         - mountPath: /runtime-config
           name: deep-runtime-conf
-        {{- if .Values.deep.persistence.enabled }}
         - mountPath: /var/deep
           name: storage
-        {{- end }}
         {{- if .Values.metricsGenerator.enabled }}
         - mountPath: /tmp
           name: tmp
@@ -109,7 +107,11 @@ spec:
         {{- if .Values.metricsGenerator.enabled }}
         - name: tmp
           emptyDir: {}
-      {{- end }}
+        {{- end }}
+        {{- if not .Values.deep.persistence.enabled }}
+        - name: storage
+          emptyDir: { }
+        {{- end }}
   updateStrategy:
     type: {{- toYaml .Values.deep.updateStrategy | nindent 6 }}
   {{- if .Values.deep.persistence.enabled }}

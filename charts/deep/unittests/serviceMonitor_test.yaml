@@ -34,6 +34,7 @@ tests:
       config:
         clusterName: "fromconfig"
       monitoring:
+        enabled: true
         serviceMonitor:
           clusterLabel: "labelfromconfig"
     template: serviceMonitor.yaml
