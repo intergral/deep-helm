@@ -52,13 +52,13 @@ jobs:
           name: helm_index
       - run: cp index.yaml _site/index.yaml
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
 
   deploy:
     needs: build_docs
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: https://intergral.github.io/deep-helm/
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
