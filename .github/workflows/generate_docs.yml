@@ -27,7 +27,7 @@ jobs:
         with:
           ref: gh-pages
       - name: upload index
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: helm_index
           path: index.yaml
@@ -47,7 +47,7 @@ jobs:
       - run: cp styles.css docs_out/styles.css
       - run: mkdocs build
       - name: Download index
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: helm_index
       - run: cp index.yaml _site/index.yaml
