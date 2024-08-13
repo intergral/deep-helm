@@ -1021,6 +1021,8 @@ monitoring:
       app_name: '{{ include "deep.fullname" . }}'
     # Additional annotations to add to the alerts
     alertAnnotations: {}
+    # Additional rules to add to all alert rules
+    additionalRuleExpr: ""
     # The rules to add
     rules:
       - alert: Unhealthy Ring Member
@@ -1032,7 +1034,7 @@ monitoring:
           runbook_url: https://intergral.github.io/deep/runbooks/unhealthy_ring_node/
           summary: One or more ring members are unhealthy
       - alert: Required Ring Member Missing
-        expr: deep_ring_members{state="ACTIVE", cluster="{{ include "deep.clusterName" .}}", name=~"ingester|tracepoint"} == 0
+        expr: deep_ring_members{state="ACTIVE", cluster="{{ include "deep.clusterName" .}}"{{ tpl .Values.monitoring.rules.additionalRuleExpr $ }}, name=~"ingester|tracepoint"} == 0
         labels:
           severity: critical
         annotations:
@@ -1040,7 +1042,7 @@ monitoring:
           runbook_url: https://intergral.github.io/deep/runbooks/missing_ring_node/
           summary: One or more ring has missing required nodes
       - alert: Tracepoint ring missing member
-        expr: deep_ring_members{state="ACTIVE", cluster="{{ include "deep.clusterName" .}}", name="tracepoint"} != {{ .Values.tracepoint.replicas }}
+        expr: deep_ring_members{state="ACTIVE", cluster="{{ include "deep.clusterName" .}}"{{ tpl .Values.monitoring.rules.additionalRuleExpr $ }}, name="tracepoint"} != {{ .Values.tracepoint.replicas }}
         labels:
           severity: critical
         annotations:
@@ -1048,7 +1050,7 @@ monitoring:
           runbook_url: https://intergral.github.io/deep/runbooks/missing_ring_node/
           summary: One or more ring has missing required nodes
       - alert: Ingester ring missing member
-        expr: deep_ring_members{state="ACTIVE", cluster="{{ include "deep.clusterName" .}}", name="ingester"} != {{ .Values.ingester.replicas }}
+        expr: deep_ring_members{state="ACTIVE", cluster="{{ include "deep.clusterName" .}}"{{ tpl .Values.monitoring.rules.additionalRuleExpr $ }}, name="ingester"} != {{ .Values.ingester.replicas }}
         labels:
           severity: critical
         annotations:
@@ -1056,7 +1058,7 @@ monitoring:
           runbook_url: https://intergral.github.io/deep/runbooks/missing_ring_node/
           summary: One or more ring has missing required nodes
       - alert: Compactor ring missing member
-        expr: deep_ring_members{state="ACTIVE", cluster="{{ include "deep.clusterName" .}}", name="compactor"} != {{ .Values.compactor.replicas }}
+        expr: deep_ring_members{state="ACTIVE", cluster="{{ include "deep.clusterName" .}}"{{ tpl .Values.monitoring.rules.additionalRuleExpr $ }}, name="compactor"} != {{ .Values.compactor.replicas }}
         labels:
           severity: critical
         annotations:
@@ -1064,7 +1066,7 @@ monitoring:
           runbook_url: https://intergral.github.io/deep/runbooks/missing_ring_node/
           summary: One or more ring has missing required nodes
       - alert: Metrics Generator ring missing member
-        expr: deep_ring_members{state="ACTIVE", cluster="{{ include "deep.clusterName" .}}", name="metrics-generator"} != {{ if .Values.metricsGenerator.enabled }} {{.Values.distributor.replicas }} {{else}}0{{end}}
+        expr: deep_ring_members{state="ACTIVE", cluster="{{ include "deep.clusterName" .}}"{{ tpl .Values.monitoring.rules.additionalRuleExpr $ }}, name="metrics-generator"} != {{ if .Values.metricsGenerator.enabled }} {{.Values.distributor.replicas }} {{else}}0{{end}}
         labels:
           severity: critical
         annotations:
@@ -1072,7 +1074,7 @@ monitoring:
           runbook_url: https://intergral.github.io/deep/runbooks/missing_ring_node/
           summary: One or more ring has missing required nodes
       - alert: Rapid increase in blocks
-        expr: delta(deep_db_blocklist_length{cluster="{{ include "deep.clusterName" .}}"}[24h]) > 30
+        expr: delta(deep_db_blocklist_length{cluster="{{ include "deep.clusterName" .}}"{{ tpl .Values.monitoring.rules.additionalRuleExpr $ }}}[24h]) > 30
         for: 48h
         labels:
           severity: warning
