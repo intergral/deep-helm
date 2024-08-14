@@ -471,7 +471,7 @@ monitoring:
     # The rules to add
     rules:
       - alert: Unhealthy Ring Member
-        expr: deep_ring_members{state="Unhealthy"} > 0
+        expr: deep_ring_members{state="Unhealthy"{{ tpl .Values.monitoring.rules.additionalRuleExpr $ }}} > 0
         labels:
           severity: critical
         annotations:
