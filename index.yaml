@@ -3,6 +3,20 @@ entries:
   deep:
   - apiVersion: v2
     appVersion: 1.0.8
+    created: "2024-08-14T09:54:10.840967931Z"
+    description: A Helm chart for running deep as a monolith
+    digest: 6707b596d9d4cbf3a11d87696fc3ac707700d1daa5a6d9642af7c48e6df79b88
+    icon: https://raw.githubusercontent.com/intergral/deep/master/docs/docs/images/logo/logo.svg
+    maintainers:
+    - email: b.w.donnelly1@gmail.com
+      name: Ben Donnelly
+    name: deep
+    type: application
+    urls:
+    - https://github.com/intergral/deep-helm/releases/download/deep-1.0.25/deep-1.0.25.tgz
+    version: 1.0.25
+  - apiVersion: v2
+    appVersion: 1.0.8
     created: "2024-08-13T13:27:04.204970832Z"
     description: A Helm chart for running deep as a monolith
     digest: e36d6b3cf359738c6c954ab6cf87b3fd5336962de75a31eb9f3f808ef09fcfeb
@@ -463,6 +477,19 @@ entries:
   deep-distributed:
   - apiVersion: v2
     appVersion: 1.0.8
+    created: "2024-08-14T09:54:10.965268398Z"
+    description: A helm chart for deploying Deep in distributed mode.
+    digest: 9b1fb08da480e8b7b54d5b2b081aa36b7cf6acd29df7a71cd2c31192fcfacd18
+    maintainers:
+    - email: b.w.donnelly1@gmail.com
+      name: Ben Donnelly
+    name: deep-distributed
+    type: application
+    urls:
+    - https://github.com/intergral/deep-helm/releases/download/deep-distributed-1.0.11/deep-distributed-1.0.11.tgz
+    version: 1.0.11
+  - apiVersion: v2
+    appVersion: 1.0.8
     created: "2024-08-13T13:27:04.363922685Z"
     description: A helm chart for deploying Deep in distributed mode.
     digest: 15bb477005938e70c40bf764ab6375fca05f7db74b647c3aaff78e07dbe71038
@@ -877,4 +904,4 @@ entries:
     urls:
     - https://github.com/intergral/deep-helm/releases/download/deep-distributed-0.0.3/deep-distributed-0.0.3.tgz
     version: 0.0.3
-generated: "2024-08-13T13:27:04.364303646Z"
+generated: "2024-08-14T09:54:10.965687381Z"
