@@ -519,7 +519,7 @@ monitoring:
           runbook_url: https://intergral.github.io/deep/runbooks/missing_ring_node/
           summary: One or more ring has missing required nodes
       - alert: Rapid increase in blocks
-        expr: delta(deep_db_blocklist_length{cluster="{{ include "deep.clusterName" .}}{{ tpl .Values.monitoring.rules.additionalRuleExpr $ }}"}[24h]) > 30
+        expr: delta(deep_db_blocklist_length{cluster="{{ include "deep.clusterName" .}}"{{ tpl .Values.monitoring.rules.additionalRuleExpr $ }}}[24h]) > 30
         for: 48h
         labels:
           severity: warning
