@@ -1,6 +1,6 @@
 {{- if .Values.gateway.enabled -}}
 {{- if .Values.gateway.traefik.enabled -}}
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: {{ .Values.gateway.traefik.apiVersion }}
 kind: IngressRoute
 metadata:
   name: {{ template "deep.fullname" . }}
