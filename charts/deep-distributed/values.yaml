@@ -1190,6 +1190,7 @@ gateway:
     additionalPorts: {}
   # config for using traefik 'IngressRoute'
   traefik:
+    apiVersion: traefik.containo.us/v1alpha1
     # -- Specified whether an IngressRoute should be created
     enabled: false
     host: gateway.deep.example.com

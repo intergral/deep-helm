@@ -1,6 +1,6 @@
 {{- if .Values.service.enabled -}}
 {{- if .Values.service.traefik.enabled -}}
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: {{ .Values.service.traefik.apiVersion }}
 kind: IngressRoute
 metadata:
   name: {{ template "deep.fullname" . }}
