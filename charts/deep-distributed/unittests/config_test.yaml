@@ -1,0 +1,37 @@
+suite: test configmap
+chart:
+  version: 9.9.9+test
+  appVersion: 1.1.1+test
+release:
+  name: deep
+tests:
+  - it: should merge configs
+    template: configmap-deep.yaml
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - matchRegex:
+          path: metadata.name
+          pattern: deep
+      - matchRegex:
+          path: data["deep.yaml"]
+          pattern: "compactor:(?:\n\\s+[^\\n]+)*\\n\\s+ring:\\n\\s+kvstore:\\n\\s+store:\\s+memberlist"
+  - it: should merge configs - when using overrides
+    template: configmap-deep.yaml
+    set:
+      compactor:
+        config:
+          ring:
+            instance_addr: ${POD_IP}
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - matchRegex:
+          path: metadata.name
+          pattern: deep
+      - matchRegex:
+          path: data["deep.yaml"]
+          pattern: "compactor:(?:\n\\s+[^\\n]+)*\\n\\s+ring:(?:\n\\s+[^\\n]+)*\\n\\s+kvstore:\\n\\s+store:\\s+memberlist"
+      - matchRegex:
+          path: data["deep.yaml"]
+          pattern: "compactor:(?:\n\\s+[^\\n]+)*\\n\\s+ring:\\n\\s+instance_addr:\\s+\\$\\{POD_IP\\}"
