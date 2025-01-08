@@ -21,7 +21,7 @@ version: 1.0.12
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "1.0.8"
+appVersion: "1.0.9"
 maintainers:
   - name: Ben Donnelly
     email: b.w.donnelly1@gmail.com
