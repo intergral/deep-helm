@@ -2,8 +2,6 @@ suite: test configmap
 chart:
   version: 9.9.9+test
   appVersion: 1.1.1+test
-release:
-  name: deep
 tests:
   - it: should merge configs
     template: configmap-deep.yaml
