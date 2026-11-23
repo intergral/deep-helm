@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: helm plugin install https://github.com/helm-unittest/helm-unittest.git --version 0.7.1
+      - run: helm plugin install https://github.com/helm-unittest/helm-unittest.git --version 1.2.1 --verify=false
       - name: Helm unittest
         run: |
           helm unittest -f unittests/**/*_test.yaml ${GITHUB_WORKSPACE}/charts/deep
