@@ -1022,30 +1022,52 @@ monitoring:
     additionalRuleExpr: ""
     # The rules to add
     rules:
+      # Every pod that watches a ring reports it, so ring rules aggregate per
+      # ring: one alert per ring, not one per reporting pod, and a reporting
+      # pod replaced mid-alert does not resolve and re-fire it.
       - alert: Unhealthy Ring Member
-        expr: deep_ring_members{state="Unhealthy"{{ tpl .Values.monitoring.rules.additionalRuleExpr $ }}} > 0
+        # A member that dies without leaving is unhealthy after the ring
+        # heartbeat timeout and auto-forgotten after twice that. `for` must
+        # outlast that window, so only a member that is never forgotten fires.
+        expr: max by (cluster, name) (deep_ring_members{state="Unhealthy"{{ tpl .Values.monitoring.rules.additionalRuleExpr $ }}}) > 0
+        for: 10m
         labels:
           severity: critical
         annotations:
-          description: "{{ $labels.service }} has {{ $value }} unhealthy nodes in ring {{ $labels.name }}."
+          description: "Ring {{ $labels.name }} has {{ $value }} unhealthy members."
           runbook_url: https://intergral.github.io/deep/runbooks/unhealthy_ring_node/
           summary: One or more ring members are unhealthy
       - alert: Required Ring Member Missing
-        expr: deep_ring_members{state="ACTIVE", cluster="{{ include "deep.clusterName" .}}"{{ tpl .Values.monitoring.rules.additionalRuleExpr $ }}, name=~"ingester|tracepoint"} == 0
+        expr: max by (cluster, name) (deep_ring_members{state="ACTIVE", cluster="{{ include "deep.clusterName" .}}"{{ tpl .Values.monitoring.rules.additionalRuleExpr $ }}, name=~"ingester|tracepoints"}) == 0
+        for: 5m
         labels:
           severity: critical
         annotations:
-          description: "{{ $labels.service }} has {{ $value }} active nodes in ring {{ $labels.name }}."
+          description: "Ring {{ $labels.name }} has {{ $value }} active members."
           runbook_url: https://intergral.github.io/deep/runbooks/missing_ring_node/
           summary: One or more ring has missing required nodes
       - alert: Tracepoint ring missing member
-        expr: deep_ring_members{state="ACTIVE", cluster="{{ include "deep.clusterName" .}}"{{ tpl .Values.monitoring.rules.additionalRuleExpr $ }}, name="tracepoint"} != {{ .Values.tracepoint.replicas }}
+        expr: max by (cluster, name) (deep_ring_members{state="ACTIVE", cluster="{{ include "deep.clusterName" .}}"{{ tpl .Values.monitoring.rules.additionalRuleExpr $ }}, name="tracepoints"}) != {{ .Values.tracepoint.replicas }}
+        for: 10m
         labels:
           severity: critical
         annotations:
-          description: "{{ $labels.service }} has {{ $value }} active nodes in ring {{ $labels.name }}."
+          description: "Ring {{ $labels.name }} has {{ $value }} active members."
           runbook_url: https://intergral.github.io/deep/runbooks/missing_ring_node/
           summary: One or more ring has missing required nodes
+      - alert: Tracepoint polls failing
+        # Agents poll the distributor for their tracepoints. A failed poll
+        # leaves the agent with stale tracepoints, whatever the ring reports.
+        expr: |-
+          sum by (cluster) (rate(deep_distributor_failed_poll_requests{cluster="{{ include "deep.clusterName" .}}"{{ tpl .Values.monitoring.rules.additionalRuleExpr $ }}}[5m]))
+            / sum by (cluster) (rate(deep_distributor_poll_requests{cluster="{{ include "deep.clusterName" .}}"{{ tpl .Values.monitoring.rules.additionalRuleExpr $ }}}[5m]))
+            > 0.05
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          description: "{{ $value | humanizePercentage }} of agent polls fail."
+          summary: Agents cannot load their tracepoints
       - alert: Ingester ring missing member
         expr: deep_ring_members{state="ACTIVE", cluster="{{ include "deep.clusterName" .}}"{{ tpl .Values.monitoring.rules.additionalRuleExpr $ }}, name="ingester"} != {{ .Values.ingester.replicas }}
         labels:
